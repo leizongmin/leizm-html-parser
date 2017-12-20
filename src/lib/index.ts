@@ -83,8 +83,8 @@ export function parse(input: string): Result {
   }
 
   function addTag() {
-    const tagNameLC = currentTagName.toLowerCase();
-    const isClose = tagNameLC.charCodeAt(0) === C_SLASH;
+    const tagNameLow = currentTagName.toLowerCase();
+    const isClose = tagNameLow.charCodeAt(0) === C_SLASH;
     if (isClose) {
       currentTagName = currentTagName.slice(1);
     }
@@ -109,9 +109,9 @@ export function parse(input: string): Result {
       }
     } else if (
       currentSelfCloseTag ||
-      tagNameLC === "hr" ||
-      tagNameLC === "br" ||
-      tagNameLC === "!--"
+      tagNameLow === "hr" ||
+      tagNameLow === "br" ||
+      tagNameLow === "!--"
     ) {
       pushToCurrentChildren(newTag);
     } else {
