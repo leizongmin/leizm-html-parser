@@ -19,14 +19,17 @@ const S_TEXT_START = 0;
 const S_TAG_NAME_START = 1;
 const S_PROP_NAME_START = 2;
 const S_PROP_VALUE_START = 4;
+const S_COMMENT_START = 8;
 type State = number;
 
 const C_LT = "<".charCodeAt(0);
 const C_GT = ">".charCodeAt(0);
 const C_EQ = "=".charCodeAt(0);
 const C_SLASH = "/".charCodeAt(0);
+const C_MINUS = "-".charCodeAt(0);
 const C_S_QUOTE = "'".charCodeAt(0);
 const C_D_QUOTE = '"'.charCodeAt(0);
+const C_EXCLAMATION = "!".charCodeAt(0);
 const C_SPACE = " ".charCodeAt(0);
 const C_INVISIBLE_MAX = 32;
 
@@ -81,18 +84,18 @@ export function parse(input: string): NodeChildren {
       currentTagName = currentTagName.slice(1);
     }
     const newTag: Node = {
-      tagName: currentTagName,
-      props: currentProps,
-      children: []
+      tagName: currentTagName
     };
-    if (newTag.props && Object.keys(newTag.props).length < 1) {
-      delete newTag.props;
+    if (Object.keys(currentProps).length > 0) {
+      newTag.props = currentProps;
     }
 
     if (isClose) {
       const tag = currentStack.pop() as Node;
       const parent = currentStack[currentStack.length - 1];
-      currentChildren = parent ? parent.children as Array<string | Node> : nodes;
+      currentChildren = parent
+        ? (parent.children as Array<string | Node>)
+        : nodes;
       if (tag && tag.tagName !== newTag.tagName) {
         emitError(
           lastPos - 1,
@@ -102,13 +105,14 @@ export function parse(input: string): NodeChildren {
     } else if (
       currentSelfCloseTag ||
       tagNameLC === "hr" ||
-      tagNameLC === "br"
+      tagNameLC === "br" ||
+      tagNameLC === "!--"
     ) {
-      delete newTag.children;
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);
       const last = lastChildNode() as Node;
+      last.children = last.children || [];
       currentStack.push(last);
       currentChildren = last.children as Node[];
     }
@@ -152,6 +156,14 @@ export function parse(input: string): NodeChildren {
           addTag();
           changeState(S_TEXT_START, pos + 1);
           continue;
+        } else if (c === C_MINUS) {
+          const pc = input.charCodeAt(pos - 1);
+          const nc = input.charCodeAt(pos + 1);
+          if (pc === C_EXCLAMATION && nc === c) {
+            currentTagName = "!--";
+            changeState(S_COMMENT_START, pos + 2);
+            continue;
+          }
         }
         break;
 
@@ -213,12 +225,31 @@ export function parse(input: string): NodeChildren {
         }
         break;
 
+      case S_COMMENT_START:
+        if (c === C_GT) {
+          const pc = input.charCodeAt(pos - 1);
+          const pc2 = input.charCodeAt(pos - 2);
+          if (pc === pc2 && pc === C_MINUS) {
+            currentProps.comment = getBuf(pos - 2);
+            addTag();
+            changeState(S_TEXT_START, pos + 1);
+          }
+        }
+        break;
+
       default:
         throw new Error(`invalid state`);
     }
   }
 
-  addText(len);
+  switch (state) {
+    case S_COMMENT_START:
+      currentProps.comment = getBuf(len);
+      addTag();
+      break;
+    default:
+      addText(len);
+  }
 
   if (errors.length > 0) {
     console.log(errors);
@@ -234,7 +265,9 @@ export function toString(nodes: NodeChildren): string {
       if (typeof item === "string") {
         html += item;
       } else if (item) {
-        if (item.children) {
+        if (item.tagName === "!--" && item.props) {
+          html += `<!--${item.props.comment}-->`;
+        } else if (item.children) {
           html +=
             `<${item.tagName}${propsToString(item.props)}>` +
             toString(item.children) +

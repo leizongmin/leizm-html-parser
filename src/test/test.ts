@@ -68,5 +68,20 @@ describe("@leizm/html-parser", function() {
     assert("<a data='\"'>\"<", [
       { tagName: "a", props: { data: '"' }, children: ['"'] }
     ]);
+    assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
+      {
+        tagName: "!--",
+        props: { comment: "\nThis is a comment\n" }
+      },
+      "\n",
+      {
+        tagName: "b",
+        children: ["comment"]
+      },
+      {
+        tagName: "!--",
+        props: { comment: "unexpected" }
+      }
+    ]);
   });
 });
