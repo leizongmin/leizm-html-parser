@@ -15,11 +15,11 @@ export interface Props {
   [key: string]: string | boolean | number;
 }
 
-const S_TEXT_START = 0;
-const S_TAG_NAME_START = 1;
-const S_PROP_NAME_START = 2;
-const S_PROP_VALUE_START = 4;
-const S_COMMENT_START = 8;
+const S_TEXT = 0;
+const S_TAG_NAME = 1;
+const S_PROP_NAME = 2;
+const S_PROP_VALUE = 4;
+const S_COMMENT = 8;
 type State = number;
 
 const C_LT = "<".charCodeAt(0);
@@ -33,12 +33,17 @@ const C_EXCLAMATION = "!".charCodeAt(0);
 const C_SPACE = " ".charCodeAt(0);
 const C_INVISIBLE_MAX = 32;
 
-export function parse(input: string): NodeChildren {
+export interface Result {
+  errors: ErrorMessage[];
+  nodes: NodeChildren;
+}
+
+export function parse(input: string): Result {
   const nodes: NodeChildren = [];
   const errors: ErrorMessage[] = [];
   const len = input.length;
 
-  let state: State = S_TEXT_START;
+  let state: State = S_TEXT;
   let lastPos = 0;
   let currentStack: Node[] = [];
   let currentChildren: NodeChildren = nodes;
@@ -138,36 +143,36 @@ export function parse(input: string): NodeChildren {
   for (let pos = 0; pos < len; pos++) {
     const c = input.charCodeAt(pos);
     switch (state) {
-      case S_TEXT_START:
+      case S_TEXT:
         if (c === C_LT) {
           addText(pos);
-          changeState(S_TAG_NAME_START, pos + 1);
+          changeState(S_TAG_NAME, pos + 1);
           continue;
         }
         break;
 
-      case S_TAG_NAME_START:
+      case S_TAG_NAME:
         if (c <= C_INVISIBLE_MAX) {
           currentTagName = getBuf(pos);
-          changeState(S_PROP_NAME_START, pos + 1);
+          changeState(S_PROP_NAME, pos + 1);
           continue;
         } else if (c === C_GT) {
           currentTagName = getBuf(pos);
           addTag();
-          changeState(S_TEXT_START, pos + 1);
+          changeState(S_TEXT, pos + 1);
           continue;
         } else if (c === C_MINUS) {
           const pc = input.charCodeAt(pos - 1);
           const nc = input.charCodeAt(pos + 1);
           if (pc === C_EXCLAMATION && nc === c) {
             currentTagName = "!--";
-            changeState(S_COMMENT_START, pos + 2);
+            changeState(S_COMMENT, pos + 2);
             continue;
           }
         }
         break;
 
-      case S_PROP_NAME_START:
+      case S_PROP_NAME:
         if (c === C_EQ) {
           currentPropQuote = 0;
           currentPropName = getBuf(pos);
@@ -175,64 +180,64 @@ export function parse(input: string): NodeChildren {
           if (nc === C_S_QUOTE || c === C_D_QUOTE) {
             currentPropQuote = nc;
             pos++;
-            changeState(S_PROP_VALUE_START, pos + 1);
+            changeState(S_PROP_VALUE, pos + 1);
           } else if (nc === C_SPACE) {
             pos++;
             addProp(pos);
-            changeState(S_PROP_NAME_START, pos + 1);
+            changeState(S_PROP_NAME, pos + 1);
           } else {
-            changeState(S_PROP_VALUE_START, pos + 1);
+            changeState(S_PROP_VALUE, pos + 1);
           }
           continue;
         } else if (c === C_S_QUOTE || c === C_D_QUOTE) {
           currentPropQuote = c;
           currentPropName = getBuf(pos);
-          changeState(S_PROP_VALUE_START, pos + 1);
+          changeState(S_PROP_VALUE, pos + 1);
           continue;
         } else if (c <= C_INVISIBLE_MAX) {
           currentPropName = getBuf(pos);
           addProp(pos);
-          changeState(S_PROP_NAME_START, pos + 1);
+          changeState(S_PROP_NAME, pos + 1);
           continue;
         } else if (c === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos);
           addTag();
-          changeState(S_TEXT_START, pos + 1);
+          changeState(S_TEXT, pos + 1);
           continue;
         } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos);
           currentSelfCloseTag = true;
           addTag();
-          changeState(S_TEXT_START, pos + 2);
+          changeState(S_TEXT, pos + 2);
           continue;
         }
         break;
 
-      case S_PROP_VALUE_START:
+      case S_PROP_VALUE:
         if (c === currentPropQuote) {
           addProp(pos);
-          changeState(S_PROP_NAME_START, pos + 1);
+          changeState(S_PROP_NAME, pos + 1);
           continue;
         } else if (currentPropQuote === 0 && c === C_SPACE) {
           addProp(pos);
-          changeState(S_PROP_NAME_START, pos + 1);
+          changeState(S_PROP_NAME, pos + 1);
         } else if (c === C_GT) {
           addProp(pos);
           addTag();
-          changeState(S_TEXT_START, pos + 1);
+          changeState(S_TEXT, pos + 1);
         }
         break;
 
-      case S_COMMENT_START:
+      case S_COMMENT:
         if (c === C_GT) {
           const pc = input.charCodeAt(pos - 1);
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_MINUS) {
             currentProps.comment = getBuf(pos - 2);
             addTag();
-            changeState(S_TEXT_START, pos + 1);
+            changeState(S_TEXT, pos + 1);
           }
         }
         break;
@@ -243,7 +248,7 @@ export function parse(input: string): NodeChildren {
   }
 
   switch (state) {
-    case S_COMMENT_START:
+    case S_COMMENT:
       currentProps.comment = getBuf(len);
       addTag();
       break;
@@ -251,11 +256,7 @@ export function parse(input: string): NodeChildren {
       addText(len);
   }
 
-  if (errors.length > 0) {
-    console.log(errors);
-  }
-
-  return nodes;
+  return { errors, nodes };
 }
 
 export function toString(nodes: NodeChildren): string {
