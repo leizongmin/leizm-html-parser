@@ -107,5 +107,45 @@ describe("@leizm/html-parser", function() {
         }
       }
     ]);
+
+    assert(
+      '<html><body><h1>Title</h1><div id="main" class="test"><p>Hello<em>world</em>!</p></div></body></html>',
+      [
+        {
+          tagName: "html",
+          children: [
+            {
+              tagName: "body",
+              children: [
+                {
+                  tagName: "h1",
+                  children: ["Title"]
+                },
+                {
+                  tagName: "div",
+                  properties: {
+                    id: "main",
+                    class: "test"
+                  },
+                  children: [
+                    {
+                      tagName: "p",
+                      children: [
+                        "Hello",
+                        {
+                          tagName: "em",
+                          children: ["world"]
+                        },
+                        "!"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    );
   });
 });

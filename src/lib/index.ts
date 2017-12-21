@@ -32,7 +32,7 @@ const C_EXCLAMATION = "!".charCodeAt(0);
 const C_SPACE = " ".charCodeAt(0);
 const C_INVISIBLE_MAX = 32;
 
-const AUTO_CLOSE_TAGS = ["br", "hr", "!--", "!doctype"];
+const AUTO_CLOSE_TAGS = ["br", "hr", "img", "href", "base", "!--", "!doctype"];
 
 export interface Result {
   errors: ErrorMessage[];
@@ -176,7 +176,7 @@ export function parse(input: string): Result {
           currentPropQuote = 0;
           currentPropName = getBuf(pos);
           const nc = input.charCodeAt(pos + 1);
-          if (nc === C_S_QUOTE || c === C_D_QUOTE) {
+          if (nc === C_S_QUOTE || nc === C_D_QUOTE) {
             currentPropQuote = nc;
             pos++;
             changeState(S_PROP_VALUE, pos + 1);
