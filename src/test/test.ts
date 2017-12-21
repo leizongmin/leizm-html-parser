@@ -148,4 +148,37 @@ describe("@leizm/html-parser", function() {
       ]
     );
   });
+
+  it("doctype", function() {
+    assert("<!DOCTYPE html>", [
+      {
+        tagName: "!DOCTYPE",
+        properties: {
+          html: true
+        }
+      }
+    ]);
+
+    assert('<!DOCTYPE html SYSTEM "about:legacy-compat">', [
+      {
+        tagName: "!DOCTYPE",
+        properties: {
+          html: true,
+          SYSTEM: true,
+          '"about:legacy-compat"': true
+        }
+      }
+    ]);
+
+    assert("<!DOCTYPE html SYSTEM 'about:legacy-compat'>", [
+      {
+        tagName: "!DOCTYPE",
+        properties: {
+          html: true,
+          SYSTEM: true,
+          '"about:legacy-compat"': true
+        }
+      }
+    ]);
+  });
 });

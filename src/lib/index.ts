@@ -134,6 +134,11 @@ export function parse(input: string): Result {
         const value = getBuf(pos);
         currentProps[name] = value;
       }
+    } else {
+      const value = getBuf(pos);
+      if (value) {
+        currentProps[`"${value}"`] = true;
+      }
     }
     currentPropName = "";
     currentPropQuote = 0;
