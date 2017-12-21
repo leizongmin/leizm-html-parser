@@ -1,5 +1,7 @@
 # @leizm/html-parser
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/leizongmin/leizm-html-parser.svg)](https://greenkeeper.io/)
+
 Faster HTML parser written in pure JavaScript
 
 ## License
