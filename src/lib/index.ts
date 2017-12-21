@@ -32,6 +32,8 @@ const C_EXCLAMATION = "!".charCodeAt(0);
 const C_SPACE = " ".charCodeAt(0);
 const C_INVISIBLE_MAX = 32;
 
+const AUTO_CLOSE_TAGS = ["br", "hr", "!--", "!doctype"];
+
 export interface Result {
   errors: ErrorMessage[];
   nodes: NodeChildren;
@@ -108,9 +110,7 @@ export function parse(input: string): Result {
       }
     } else if (
       currentSelfCloseTag ||
-      tagNameLow === "hr" ||
-      tagNameLow === "br" ||
-      tagNameLow === "!--"
+      AUTO_CLOSE_TAGS.indexOf(tagNameLow) !== -1
     ) {
       pushToCurrentChildren(newTag);
     } else {
@@ -182,7 +182,7 @@ export function parse(input: string): Result {
             changeState(S_PROP_VALUE, pos + 1);
           } else if (nc === C_SPACE) {
             pos++;
-            addProp(pos);
+            addProp(pos, true);
             changeState(S_PROP_NAME, pos + 1);
           } else {
             changeState(S_PROP_VALUE, pos + 1);
@@ -195,18 +195,18 @@ export function parse(input: string): Result {
           continue;
         } else if (c <= C_INVISIBLE_MAX) {
           currentPropName = getBuf(pos);
-          addProp(pos);
+          addProp(pos, true);
           changeState(S_PROP_NAME, pos + 1);
           continue;
         } else if (c === C_GT) {
           currentPropName = getBuf(pos);
-          addProp(pos);
+          addProp(pos, true);
           addTag();
           changeState(S_TEXT, pos + 1);
           continue;
         } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
           currentPropName = getBuf(pos);
-          addProp(pos);
+          addProp(pos, true);
           currentSelfCloseTag = true;
           addTag();
           changeState(S_TEXT, pos + 2);
@@ -267,6 +267,8 @@ export function toString(nodes: NodeChildren): string {
       } else if (item) {
         if (item.tagName === "!--" && item.properties) {
           html += `<!--${item.properties.comment}-->`;
+        } else if (item.tagName.toLocaleLowerCase() === "!doctype") {
+          html += `<${item.tagName}${propsToString(item.properties)}>`;
         } else if (item.children) {
           html +=
             `<${item.tagName}${propsToString(item.properties)}>` +
@@ -285,7 +287,11 @@ function propsToString(props?: Properties): string {
   let ret = "";
   if (props) {
     for (const name in props) {
-      ret += ` ${name}=${formatPropValue(props[name])}`;
+      if (props[name] === true) {
+        ret += ` ${name}`;
+      } else {
+        ret += ` ${name}=${formatPropValue(props[name])}`;
+      }
     }
   }
   return ret;

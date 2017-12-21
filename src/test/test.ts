@@ -41,7 +41,7 @@ describe("@leizm/html-parser", function() {
     assert("<a href='#' disable>hello</a>", [
       {
         tagName: "a",
-        properties: { href: "#", disable: "disable" },
+        properties: { href: "#", disable: true },
         children: ["hello"]
       }
     ]);
@@ -66,7 +66,11 @@ describe("@leizm/html-parser", function() {
               tagName: "span",
               children: [
                 "click ",
-                { tagName: "a", properties: { href: "here" }, children: ["link"] }
+                {
+                  tagName: "a",
+                  properties: { href: "here" },
+                  children: ["link"]
+                }
               ]
             }
           ]
@@ -92,6 +96,15 @@ describe("@leizm/html-parser", function() {
       {
         tagName: "!--",
         properties: { comment: "unexpected" }
+      }
+    ]);
+
+    assert("<!doctype html>", [
+      {
+        tagName: "!doctype",
+        properties: {
+          html: true
+        }
       }
     ]);
   });
