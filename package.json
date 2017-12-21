@@ -4,16 +4,15 @@
   "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
   "scripts": {
-    "test": "mocha --require ts-node/register src/test/**/*.ts"
+    "test": "mocha --require ts-node/register src/test/**/*.ts",
+    "compile": "rm -rf dist && tsc",
+    "prepublish": "npm run compile && npm run test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leizongmin/leizm-html-parser.git"
   },
-  "keywords": [
-    "html",
-    "parser"
-  ],
+  "keywords": ["html", "parser"],
   "author": "Zongmin Lei <leizongmin@gmail.com>",
   "license": "MIT",
   "bugs": {

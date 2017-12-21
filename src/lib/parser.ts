@@ -1,0 +1,283 @@
+export interface Node {
+  tagName: string;
+  properties?: Properties;
+  children?: NodeChildren;
+}
+
+export type NodeChildren = Array<Node | string>;
+
+export interface ErrorMessage {
+  position: number;
+  message: string;
+}
+
+export interface Properties {
+  [key: string]: string | boolean | number;
+}
+
+export interface Result {
+  errors: ErrorMessage[];
+  nodes: NodeChildren;
+}
+
+export function parse(input: string): Result {
+  const S_TEXT = 0;
+  const S_TAG_NAME = 1;
+  const S_PROP_NAME = 2;
+  const S_PROP_VALUE = 4;
+  const S_COMMENT = 8;
+
+  const C_INVISIBLE_MAX = 32;
+  const C_SPACE = 32; // " ".charCodeAt(0);
+  const C_EXCLAMATION = 33; // "!".charCodeAt(0);
+  const C_D_QUOTE = 34; // '"'.charCodeAt(0);
+  const C_S_QUOTE = 39; // "'".charCodeAt(0);
+  const C_MINUS = 45; // "-".charCodeAt(0);
+  const C_SLASH = 47; // "/".charCodeAt(0);
+  const C_LT = 60; // "<".charCodeAt(0);
+  const C_EQ = 61; // "=".charCodeAt(0);
+  const C_GT = 62; // ">".charCodeAt(0);
+
+  const nodes: NodeChildren = [];
+  const errors: ErrorMessage[] = [];
+  const len = input.length;
+
+  let state: number = S_TEXT;
+  let lastPos = 0;
+  let currentStack: Node[] = [];
+  let currentChildren: NodeChildren = nodes;
+  let currentTagName = "";
+  let currentProps: Properties = {};
+  let currentPropQuote = 0;
+  let currentPropName = "";
+  let currentSelfCloseTag = false;
+
+  function emitError(position: number, message: string) {
+    errors.push({ position, message });
+  }
+
+  function lastChildNode() {
+    const children = currentChildren as Node[];
+    return children[children.length - 1];
+  }
+
+  function getBuf(pos: number) {
+    return input.slice(lastPos, pos);
+  }
+
+  function changeState(newState: number, pos: number) {
+    state = newState;
+    lastPos = pos;
+  }
+
+  function pushToCurrentChildren(item: Node | string) {
+    (currentChildren as Array<Node | string>).push(item);
+  }
+
+  function addText(pos: number) {
+    const str = getBuf(pos);
+    if (str) {
+      pushToCurrentChildren(str);
+    }
+  }
+
+  function addTag() {
+    const tagNameLow = currentTagName.toLowerCase();
+    const isClose = tagNameLow.charCodeAt(0) === C_SLASH;
+    if (isClose) {
+      currentTagName = currentTagName.slice(1);
+    }
+    const newTag: Node = {
+      tagName: currentTagName
+    };
+    if (Object.keys(currentProps).length > 0) {
+      newTag.properties = currentProps;
+    }
+
+    if (isClose) {
+      const tag = currentStack.pop() as Node;
+      const parent = currentStack[currentStack.length - 1];
+      currentChildren = parent
+        ? (parent.children as Array<string | Node>)
+        : nodes;
+      if (tag && tag.tagName !== newTag.tagName) {
+        emitError(
+          lastPos - 1,
+          `close tag does not match: <${tag.tagName}></${newTag.tagName}>`
+        );
+      }
+    } else if (currentSelfCloseTag || isVoidTag(tagNameLow)) {
+      pushToCurrentChildren(newTag);
+    } else {
+      pushToCurrentChildren(newTag);
+      const last = lastChildNode() as Node;
+      last.children = last.children || [];
+      currentStack.push(last);
+      currentChildren = last.children as Node[];
+    }
+    currentTagName = "";
+    currentProps = {};
+    currentSelfCloseTag = false;
+  }
+
+  function addProp(pos: number, noValue: boolean = false) {
+    const name = currentPropName.trim();
+    if (name) {
+      if (noValue) {
+        currentProps[name] = true;
+      } else {
+        const value = getBuf(pos);
+        currentProps[name] = value;
+      }
+    } else {
+      const value = getBuf(pos);
+      if (value) {
+        currentProps[`"${value}"`] = true;
+      }
+    }
+    currentPropName = "";
+    currentPropQuote = 0;
+  }
+
+  for (let pos = 0; pos < len; pos++) {
+    const c = input.charCodeAt(pos);
+    switch (state) {
+      case S_TEXT:
+        if (c === C_LT) {
+          addText(pos);
+          changeState(S_TAG_NAME, pos + 1);
+          continue;
+        }
+        break;
+
+      case S_TAG_NAME:
+        if (c <= C_INVISIBLE_MAX) {
+          currentTagName = getBuf(pos);
+          changeState(S_PROP_NAME, pos + 1);
+          continue;
+        } else if (c === C_GT) {
+          currentTagName = getBuf(pos);
+          addTag();
+          changeState(S_TEXT, pos + 1);
+          continue;
+        } else if (c === C_MINUS) {
+          const pc = input.charCodeAt(pos - 1);
+          const nc = input.charCodeAt(pos + 1);
+          if (pc === C_EXCLAMATION && nc === c) {
+            currentTagName = "!--";
+            changeState(S_COMMENT, pos + 2);
+            continue;
+          }
+        }
+        break;
+
+      case S_PROP_NAME:
+        if (c === C_EQ) {
+          currentPropQuote = 0;
+          currentPropName = getBuf(pos);
+          const nc = input.charCodeAt(pos + 1);
+          if (nc === C_S_QUOTE || nc === C_D_QUOTE) {
+            currentPropQuote = nc;
+            pos++;
+            changeState(S_PROP_VALUE, pos + 1);
+          } else if (nc === C_SPACE) {
+            pos++;
+            addProp(pos, true);
+            changeState(S_PROP_NAME, pos + 1);
+          } else {
+            changeState(S_PROP_VALUE, pos + 1);
+          }
+          continue;
+        } else if (c === C_S_QUOTE || c === C_D_QUOTE) {
+          currentPropQuote = c;
+          currentPropName = getBuf(pos);
+          changeState(S_PROP_VALUE, pos + 1);
+          continue;
+        } else if (c <= C_INVISIBLE_MAX) {
+          currentPropName = getBuf(pos);
+          addProp(pos, true);
+          changeState(S_PROP_NAME, pos + 1);
+          continue;
+        } else if (c === C_GT) {
+          currentPropName = getBuf(pos);
+          addProp(pos, true);
+          addTag();
+          changeState(S_TEXT, pos + 1);
+          continue;
+        } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
+          currentPropName = getBuf(pos);
+          addProp(pos, true);
+          currentSelfCloseTag = true;
+          addTag();
+          changeState(S_TEXT, pos + 2);
+          continue;
+        }
+        break;
+
+      case S_PROP_VALUE:
+        if (c === currentPropQuote) {
+          addProp(pos);
+          changeState(S_PROP_NAME, pos + 1);
+          continue;
+        } else if (currentPropQuote === 0 && c === C_SPACE) {
+          addProp(pos);
+          changeState(S_PROP_NAME, pos + 1);
+        } else if (c === C_GT) {
+          addProp(pos);
+          addTag();
+          changeState(S_TEXT, pos + 1);
+        }
+        break;
+
+      case S_COMMENT:
+        if (c === C_GT) {
+          const pc = input.charCodeAt(pos - 1);
+          const pc2 = input.charCodeAt(pos - 2);
+          if (pc === pc2 && pc === C_MINUS) {
+            currentProps.comment = getBuf(pos - 2);
+            addTag();
+            changeState(S_TEXT, pos + 1);
+          }
+        }
+        break;
+
+      default:
+        throw new Error(`invalid state`);
+    }
+  }
+
+  switch (state) {
+    case S_COMMENT:
+      currentProps.comment = getBuf(len);
+      addTag();
+      break;
+    default:
+      addText(len);
+  }
+
+  return { errors, nodes };
+}
+
+function isVoidTag(name: string): boolean {
+  switch (name) {
+    case "!--":
+    case "!doctype":
+    case "area":
+    case "base":
+    case "br":
+    case "col":
+    case "embed":
+    case "hr":
+    case "img":
+    case "input":
+    case "link":
+    case "meta":
+    case "param":
+    case "source":
+    case "track":
+    case "wbr":
+      return true;
+    default:
+      return false;
+  }
+}
