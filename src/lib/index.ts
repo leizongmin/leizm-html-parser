@@ -1,6 +1,6 @@
 export interface Node {
   tagName: string;
-  props?: Props;
+  properties?: Properties;
   children?: NodeChildren;
 }
 
@@ -11,7 +11,7 @@ export interface ErrorMessage {
   message: string;
 }
 
-export interface Props {
+export interface Properties {
   [key: string]: string | boolean | number;
 }
 
@@ -20,7 +20,6 @@ const S_TAG_NAME = 1;
 const S_PROP_NAME = 2;
 const S_PROP_VALUE = 4;
 const S_COMMENT = 8;
-type State = number;
 
 const C_LT = "<".charCodeAt(0);
 const C_GT = ">".charCodeAt(0);
@@ -43,12 +42,12 @@ export function parse(input: string): Result {
   const errors: ErrorMessage[] = [];
   const len = input.length;
 
-  let state: State = S_TEXT;
+  let state: number = S_TEXT;
   let lastPos = 0;
   let currentStack: Node[] = [];
   let currentChildren: NodeChildren = nodes;
   let currentTagName = "";
-  let currentProps: Props = {};
+  let currentProps: Properties = {};
   let currentPropQuote = 0;
   let currentPropName = "";
   let currentSelfCloseTag = false;
@@ -92,7 +91,7 @@ export function parse(input: string): Result {
       tagName: currentTagName
     };
     if (Object.keys(currentProps).length > 0) {
-      newTag.props = currentProps;
+      newTag.properties = currentProps;
     }
 
     if (isClose) {
@@ -266,15 +265,15 @@ export function toString(nodes: NodeChildren): string {
       if (typeof item === "string") {
         html += item;
       } else if (item) {
-        if (item.tagName === "!--" && item.props) {
-          html += `<!--${item.props.comment}-->`;
+        if (item.tagName === "!--" && item.properties) {
+          html += `<!--${item.properties.comment}-->`;
         } else if (item.children) {
           html +=
-            `<${item.tagName}${propsToString(item.props)}>` +
+            `<${item.tagName}${propsToString(item.properties)}>` +
             toString(item.children) +
             `</${item.tagName}>`;
         } else {
-          html += `<${item.tagName}${propsToString(item.props)} />`;
+          html += `<${item.tagName}${propsToString(item.properties)} />`;
         }
       }
     }
@@ -282,7 +281,7 @@ export function toString(nodes: NodeChildren): string {
   return html;
 }
 
-function propsToString(props?: Props): string {
+function propsToString(props?: Properties): string {
   let ret = "";
   if (props) {
     for (const name in props) {

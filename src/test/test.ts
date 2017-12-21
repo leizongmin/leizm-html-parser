@@ -33,15 +33,19 @@ function assert(html: string, nodes: NodeChildren) {
 describe("@leizm/html-parser", function() {
   it("normal", function() {
     assert("hello world", ["hello world"]);
+
     assert("<a>", [{ tagName: "a", children: [] }]);
+
     assert("<a>hello</a>", [{ tagName: "a", children: ["hello"] }]);
+
     assert("<a href='#' disable>hello</a>", [
       {
         tagName: "a",
-        props: { href: "#", disable: "disable" },
+        properties: { href: "#", disable: "disable" },
         children: ["hello"]
       }
     ]);
+
     assert("say <a>hello</a> to you<br>ok", [
       "say ",
       { tagName: "a", children: ["hello"] },
@@ -49,19 +53,20 @@ describe("@leizm/html-parser", function() {
       { tagName: "br" },
       "ok"
     ]);
+
     assert(
       "start: <div id=1><span>click <a href=here>link</a></span></div> end",
       [
         "start: ",
         {
           tagName: "div",
-          props: { id: "1" },
+          properties: { id: "1" },
           children: [
             {
               tagName: "span",
               children: [
                 "click ",
-                { tagName: "a", props: { href: "here" }, children: ["link"] }
+                { tagName: "a", properties: { href: "here" }, children: ["link"] }
               ]
             }
           ]
@@ -69,13 +74,15 @@ describe("@leizm/html-parser", function() {
         " end"
       ]
     );
+
     assert("<a data='\"'>\"<", [
-      { tagName: "a", props: { data: '"' }, children: ['"'] }
+      { tagName: "a", properties: { data: '"' }, children: ['"'] }
     ]);
+
     assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
       {
         tagName: "!--",
-        props: { comment: "\nThis is a comment\n" }
+        properties: { comment: "\nThis is a comment\n" }
       },
       "\n",
       {
@@ -84,7 +91,7 @@ describe("@leizm/html-parser", function() {
       },
       {
         tagName: "!--",
-        props: { comment: "unexpected" }
+        properties: { comment: "unexpected" }
       }
     ]);
   });
