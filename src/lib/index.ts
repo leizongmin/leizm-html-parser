@@ -1,3 +1,11 @@
+/**
+ * @leizm/html-parser
+ *
+ * reference for "HTML 5.2 W3C Recommendation" https://www.w3.org/TR/html5/syntax.html
+ *
+ * @author Zongmin Lei <leizongmin@gmail.com>
+ */
+
 export interface Node {
   tagName: string;
   properties?: Properties;
@@ -15,31 +23,29 @@ export interface Properties {
   [key: string]: string | boolean | number;
 }
 
-const S_TEXT = 0;
-const S_TAG_NAME = 1;
-const S_PROP_NAME = 2;
-const S_PROP_VALUE = 4;
-const S_COMMENT = 8;
-
-const C_LT = "<".charCodeAt(0);
-const C_GT = ">".charCodeAt(0);
-const C_EQ = "=".charCodeAt(0);
-const C_SLASH = "/".charCodeAt(0);
-const C_MINUS = "-".charCodeAt(0);
-const C_S_QUOTE = "'".charCodeAt(0);
-const C_D_QUOTE = '"'.charCodeAt(0);
-const C_EXCLAMATION = "!".charCodeAt(0);
-const C_SPACE = " ".charCodeAt(0);
-const C_INVISIBLE_MAX = 32;
-
-const AUTO_CLOSE_TAGS = ["br", "hr", "img", "href", "base", "!--", "!doctype"];
-
 export interface Result {
   errors: ErrorMessage[];
   nodes: NodeChildren;
 }
 
 export function parse(input: string): Result {
+  const S_TEXT = 0;
+  const S_TAG_NAME = 1;
+  const S_PROP_NAME = 2;
+  const S_PROP_VALUE = 4;
+  const S_COMMENT = 8;
+
+  const C_INVISIBLE_MAX = 32;
+  const C_SPACE = 32; // " ".charCodeAt(0);
+  const C_EXCLAMATION = 33; // "!".charCodeAt(0);
+  const C_D_QUOTE = 34; // '"'.charCodeAt(0);
+  const C_S_QUOTE = 39; // "'".charCodeAt(0);
+  const C_MINUS = 45; // "-".charCodeAt(0);
+  const C_SLASH = 47; // "/".charCodeAt(0);
+  const C_LT = 60; // "<".charCodeAt(0);
+  const C_EQ = 61; // "=".charCodeAt(0);
+  const C_GT = 62; // ">".charCodeAt(0);
+
   const nodes: NodeChildren = [];
   const errors: ErrorMessage[] = [];
   const len = input.length;
@@ -108,10 +114,7 @@ export function parse(input: string): Result {
           `close tag does not match: <${tag.tagName}></${newTag.tagName}>`
         );
       }
-    } else if (
-      currentSelfCloseTag ||
-      AUTO_CLOSE_TAGS.indexOf(tagNameLow) !== -1
-    ) {
+    } else if (currentSelfCloseTag || isVoidTag(tagNameLow)) {
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);
@@ -261,6 +264,30 @@ export function parse(input: string): Result {
   }
 
   return { errors, nodes };
+}
+
+function isVoidTag(name: string): boolean {
+  switch (name) {
+    case "!--":
+    case "!doctype":
+    case "area":
+    case "base":
+    case "br":
+    case "col":
+    case "embed":
+    case "hr":
+    case "img":
+    case "input":
+    case "link":
+    case "meta":
+    case "param":
+    case "source":
+    case "track":
+    case "wbr":
+      return true;
+    default:
+      return false;
+  }
 }
 
 export function toString(nodes: NodeChildren): string {
