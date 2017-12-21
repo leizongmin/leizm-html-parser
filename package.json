@@ -1,7 +1,7 @@
 {
   "name": "@leizm/html-parser",
   "version": "1.0.0",
-  "description": "Faster HTML parser written in pure JavaScript",
+  "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
   "scripts": {
     "test": "mocha --require ts-node/register src/test/**/*.ts"

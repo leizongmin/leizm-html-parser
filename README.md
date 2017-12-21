@@ -1,6 +1,6 @@
 # @leizm/html-parser
 
-Faster HTML parser written in pure JavaScript
+Fast HTML parser written in pure JavaScript
 
 ## License
 
