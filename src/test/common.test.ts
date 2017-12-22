@@ -1,7 +1,7 @@
 import { assert } from "./utils";
 
 describe("Commmon", function() {
-  it("normal", function() {
+  it("Normal", function() {
     assert("hello world", ["hello world"]);
 
     assert("<a>", [{ tagName: "a", children: [] }]);
@@ -112,7 +112,7 @@ describe("Commmon", function() {
     ]);
   });
 
-  it("doctype", function() {
+  it("DOCTYPE", function() {
     assert("<!DOCTYPE html>", [
       {
         tagName: "!DOCTYPE",
@@ -141,64 +141,6 @@ describe("Commmon", function() {
           SYSTEM: true,
           '"about:legacy-compat"': true
         }
-      }
-    ]);
-  });
-
-  it("Comments", function() {
-    assert("this is <!--comments<a href=#>link</a><!-- hello --> end", [
-      "this is ",
-      {
-        tagName: "!--",
-        properties: {
-          comment: "comments<a href=#>link</a><!-- hello "
-        }
-      },
-      " end"
-    ]);
-    assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
-      {
-        tagName: "!--",
-        properties: { comment: "\nThis is a comment\n" }
-      },
-      "\n",
-      {
-        tagName: "b",
-        children: ["comment"]
-      },
-      {
-        tagName: "!--",
-        properties: { comment: "unexpected" },
-        children: []
-      }
-    ]);
-  });
-
-  it("CDATA sections", function() {
-    assert("<ms><![CDATA[x<y]]></ms>", [
-      {
-        tagName: "ms",
-        children: [
-          {
-            tagName: "![CDATA[",
-            properties: {
-              data: "x<y"
-            }
-          }
-        ]
-      }
-    ]);
-    assert("<ms><![CDATA[ <![CDATA[ <b>hello</b> ]]></ms>", [
-      {
-        tagName: "ms",
-        children: [
-          {
-            tagName: "![CDATA[",
-            properties: {
-              data: " <![CDATA[ <b>hello</b> "
-            }
-          }
-        ]
       }
     ]);
   });
