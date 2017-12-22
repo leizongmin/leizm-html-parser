@@ -24,17 +24,30 @@ function nodesToString(nodes: NodeChildren): string {
       if (typeof item === "string") {
         html += item;
       } else if (item) {
-        if (item.tagName === "!--" && item.properties) {
-          html += `<!--${item.properties.comment}-->`;
-        } else if (item.tagName.toLocaleLowerCase() === "!doctype") {
-          html += `<${item.tagName}${propsToString(item.properties)}>`;
-        } else if (item.children) {
-          html +=
-            `<${item.tagName}${propsToString(item.properties)}>` +
-            nodesToString(item.children) +
-            `</${item.tagName}>`;
-        } else {
-          html += `<${item.tagName}${propsToString(item.properties)} />`;
+        const tagName = item.tagName.toLocaleUpperCase();
+        switch (tagName) {
+          case "!--":
+            if (item.properties) {
+              html += `<!--${item.properties.comment}-->`;
+            }
+            break;
+          case "!DOCTYPE":
+            html += `<${item.tagName}${propsToString(item.properties)}>`;
+            break;
+          case "![CDATA[":
+            if (item.properties) {
+              html += `<![CDATA[${item.properties.data}]]>`;
+            }
+            break;
+          default:
+            if (item.children) {
+              html +=
+                `<${item.tagName}${propsToString(item.properties)}>` +
+                nodesToString(item.children) +
+                `</${item.tagName}>`;
+            } else {
+              html += `<${item.tagName}${propsToString(item.properties)} />`;
+            }
         }
       }
     }

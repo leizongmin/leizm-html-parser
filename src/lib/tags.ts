@@ -1,10 +1,25 @@
 /**
- * returns true if the input is void tag name
+ * Tags are used to delimit the start and end of elements in the markup.
+ * Raw text, escapable raw text, and normal elements have a start tag to indicate where they begin,
+ * and an end tag to indicate where they end.
+ * The start and end tags of certain normal elements can be omitted,
+ * as described below in the section on [[#optional tags]]. Those that cannot be omitted must not be omitted.
+ * Void elements only have a start tag; end tags must not be specified for void elements.
+ * Foreign elements must either have a start tag and an end tag, or a start tag that is marked as self-closing,
+ * in which case they must not have an end tag.
+ *
+ * @see https://www.w3.org/TR/html5/syntax.html#tags
+ */
+
+/**
+ * Returns true if the input is void tag name
+ *
+ * Void elements can’t have any contents (since there’s no end tag, no content can be put between the start tag and the end tag).
+ *
  * @param name tag name in lower case
  */
 export function isVoidTag(name: string): boolean {
   switch (name) {
-    case "!--":
     case "!doctype":
     case "area":
     case "base":
@@ -27,7 +42,13 @@ export function isVoidTag(name: string): boolean {
 }
 
 /**
- * returns true if the input is raw text tag name
+ * Returns true if the input is raw text tag name
+ *
+ * The text in raw text and escapable raw text elements must not contain any occurrences of the string "</"
+ * @see https://www.w3.org/TR/html5/syntax.html#restrictions-on-the-contents-of-raw-text-and-escapable-raw-text-elements
+ *
+ * Raw text elements can have text, though it has restrictions described below.
+ *
  * @param name tag name in lower case
  */
 export function isRawTextTag(name: string): boolean {
@@ -41,7 +62,14 @@ export function isRawTextTag(name: string): boolean {
 }
 
 /**
- * returns true if the input is escapable raw text name
+ * Returns true if the input is escapable raw text name
+ *
+ * The text in raw text and escapable raw text elements must not contain any occurrences of the string "</"
+ * @see https://www.w3.org/TR/html5/syntax.html#restrictions-on-the-contents-of-raw-text-and-escapable-raw-text-elements
+ *
+ * Escapable raw text elements can have text and character references, but the text must not contain an ambiguous ampersand. There are also further restrictions described below.
+ * An ambiguous ampersand is a U+0026 AMPERSAND character (&) that is followed by one or more alphanumeric ASCII characters, followed by a U+003B SEMICOLON character (;)
+ *
  * @param name tag name in lower case
  */
 export function isEscapableRawTextTag(name: string): boolean {
@@ -55,7 +83,7 @@ export function isEscapableRawTextTag(name: string): boolean {
 }
 
 /**
- * returns true if the input is a html5 tag name
+ * Returns true if the input is a html5 tag name
  * @param name tag name in lower case
  */
 export function isHtml5Tag(name: string): boolean {

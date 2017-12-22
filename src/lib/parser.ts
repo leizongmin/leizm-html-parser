@@ -59,6 +59,8 @@ export function parse(input: string): Result {
   const C_LT = 60; // "<".charCodeAt(0);
   const C_EQ = 61; // "=".charCodeAt(0);
   const C_GT = 62; // ">".charCodeAt(0);
+  const C_SQUARE_BRACKET_L = 91; // "[".charCodeAt(0);
+  const C_SQUARE_BRACKET_R = 93; // "]".charCodeAt(0);
 
   const nodes: NodeChildren = [];
   const errors: ErrorMessage[] = [];
@@ -140,6 +142,7 @@ export function parse(input: string): Result {
       currentStack.push(last);
       currentChildren = last.children as Node[];
     }
+
     currentTagName = "";
     currentProps = {};
     currentSelfCloseTag = false;
@@ -193,6 +196,12 @@ export function parse(input: string): Result {
             changeState(S_COMMENT, pos + 2);
             continue;
           }
+        } else if (c === C_SQUARE_BRACKET_L) {
+          if (pos - lastPos === 7 && getBuf(pos + 1) === "![CDATA[") {
+            currentTagName = "![CDATA[";
+            changeState(S_CDATA, pos + 1);
+            continue;
+          }
         }
         break;
 
@@ -205,14 +214,16 @@ export function parse(input: string): Result {
             currentPropQuote = nc;
             pos++;
             changeState(S_PROP_VALUE, pos + 1);
+            continue;
           } else if (nc === C_SPACE) {
             pos++;
             addProp(pos, true);
             changeState(S_PROP_NAME, pos + 1);
+            continue;
           } else {
             changeState(S_PROP_VALUE, pos + 1);
+            continue;
           }
-          continue;
         } else if (c === C_S_QUOTE || c === C_D_QUOTE) {
           currentPropQuote = c;
           currentPropName = getBuf(pos);
@@ -247,10 +258,12 @@ export function parse(input: string): Result {
         } else if (currentPropQuote === 0 && c === C_SPACE) {
           addProp(pos);
           changeState(S_PROP_NAME, pos + 1);
+          continue;
         } else if (c === C_GT) {
           addProp(pos);
           addTag();
           changeState(S_TEXT, pos + 1);
+          continue;
         }
         break;
 
@@ -260,8 +273,24 @@ export function parse(input: string): Result {
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_MINUS) {
             currentProps.comment = getBuf(pos - 2);
+            currentSelfCloseTag = true;
             addTag();
             changeState(S_TEXT, pos + 1);
+            continue;
+          }
+        }
+        break;
+
+      case S_CDATA:
+        if (c === C_GT) {
+          const pc = input.charCodeAt(pos - 1);
+          const pc2 = input.charCodeAt(pos - 2);
+          if (pc === pc2 && pc === C_SQUARE_BRACKET_R) {
+            currentProps.data = getBuf(pos - 2);
+            currentSelfCloseTag = true;
+            addTag();
+            changeState(S_TEXT, pos + 1);
+            continue;
           }
         }
         break;

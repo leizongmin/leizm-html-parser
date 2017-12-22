@@ -53,22 +53,6 @@ describe("Commmon", function() {
       { tagName: "a", properties: { data: '"' }, children: ['"'] }
     ]);
 
-    assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
-      {
-        tagName: "!--",
-        properties: { comment: "\nThis is a comment\n" }
-      },
-      "\n",
-      {
-        tagName: "b",
-        children: ["comment"]
-      },
-      {
-        tagName: "!--",
-        properties: { comment: "unexpected" }
-      }
-    ]);
-
     assert("<!doctype html>", [
       {
         tagName: "!doctype",
@@ -161,7 +145,7 @@ describe("Commmon", function() {
     ]);
   });
 
-  it("comments", function() {
+  it("Comments", function() {
     assert("this is <!--comments<a href=#>link</a><!-- hello --> end", [
       "this is ",
       {
@@ -171,6 +155,51 @@ describe("Commmon", function() {
         }
       },
       " end"
+    ]);
+    assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
+      {
+        tagName: "!--",
+        properties: { comment: "\nThis is a comment\n" }
+      },
+      "\n",
+      {
+        tagName: "b",
+        children: ["comment"]
+      },
+      {
+        tagName: "!--",
+        properties: { comment: "unexpected" },
+        children: []
+      }
+    ]);
+  });
+
+  it("CDATA sections", function() {
+    assert("<ms><![CDATA[x<y]]></ms>", [
+      {
+        tagName: "ms",
+        children: [
+          {
+            tagName: "![CDATA[",
+            properties: {
+              data: "x<y"
+            }
+          }
+        ]
+      }
+    ]);
+    assert("<ms><![CDATA[ <![CDATA[ <b>hello</b> ]]></ms>", [
+      {
+        tagName: "ms",
+        children: [
+          {
+            tagName: "![CDATA[",
+            properties: {
+              data: " <![CDATA[ <b>hello</b> "
+            }
+          }
+        ]
+      }
     ]);
   });
 });
