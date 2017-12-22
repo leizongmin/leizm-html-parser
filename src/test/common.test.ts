@@ -1,36 +1,6 @@
-import { expect } from "chai";
-import { inspect } from "util";
-import * as colors from "colors";
-import { parse, toString, NodeChildren } from "../lib";
+import { assert } from "./utils";
 
-function dump(input: string) {
-  const { errors, nodes } = parse(input);
-  const output = toString(nodes, { pretty: true });
-  const line = "`".repeat(process.stdout.columns || 80);
-  console.log(colors.cyan(line));
-  console.log(colors.magenta("A"), inspect(nodes, { depth: 10, colors: true }));
-  console.log(colors.magenta("I"), colors.blue(input));
-  console.log(colors.magenta("O"), colors.cyan(output));
-  if (errors.length > 0) {
-    for (const err of errors) {
-      console.log(
-        colors.magenta("Error"),
-        colors.yellow(`[${err.position}]`),
-        colors.red(err.message)
-      );
-    }
-  }
-  console.log(colors.cyan(line));
-}
-
-function assert(html: string, nodes: NodeChildren) {
-  if (process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1) {
-    dump(html);
-  }
-  return expect(parse(html).nodes).to.deep.equal(nodes);
-}
-
-describe("@leizm/html-parser", function() {
+describe("Commmon", function() {
   it("normal", function() {
     assert("hello world", ["hello world"]);
 
@@ -180,5 +150,75 @@ describe("@leizm/html-parser", function() {
         }
       }
     ]);
+  });
+
+  it("comments", function() {
+    assert("this is <!--comments<a href=#>link</a><!-- hello --> end", [
+      "this is ",
+      {
+        tagName: "!--",
+        properties: {
+          comment: "comments<a href=#>link</a><!-- hello "
+        }
+      },
+      " end"
+    ]);
+  });
+
+  it("void tags", function() {
+    assert(
+      "<input disabled><area><base href='#'><br><col><embed><hr><img src='#' title='this is img'><link href='#'><meta charset='utf-8'><param name=a><source src='##'><track><wbr>",
+      [
+        {
+          tagName: "input",
+          properties: { disabled: true }
+        },
+        {
+          tagName: "area"
+        },
+        {
+          tagName: "base",
+          properties: { href: "#" }
+        },
+        {
+          tagName: "br"
+        },
+        {
+          tagName: "col"
+        },
+        {
+          tagName: "embed"
+        },
+        {
+          tagName: "hr"
+        },
+        {
+          tagName: "img",
+          properties: { src: "#", title: "this is img" }
+        },
+        {
+          tagName: "link",
+          properties: { href: "#" }
+        },
+        {
+          tagName: "meta",
+          properties: { charset: "utf-8" }
+        },
+        {
+          tagName: "param",
+          properties: { name: "a" }
+        },
+        {
+          tagName: "source",
+          properties: { src: "##" }
+        },
+        {
+          tagName: "track"
+        },
+        {
+          tagName: "wbr"
+        }
+      ]
+    );
   });
 });
