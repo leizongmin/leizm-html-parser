@@ -83,8 +83,8 @@ export function parse(input: string): Result {
 
   function addTag() {
     const tagNameLow = currentTagName.toLowerCase();
-    const isClose = tagNameLow.charCodeAt(0) === C_SLASH;
-    if (isClose) {
+    const isEnd = tagNameLow.charCodeAt(0) === C_SLASH;
+    if (isEnd) {
       currentTagName = currentTagName.slice(1);
     }
     const newTag: Node = {
@@ -94,16 +94,18 @@ export function parse(input: string): Result {
       newTag.properties = currentProps;
     }
 
-    if (isClose) {
-      const tag = currentStack.pop() as Node;
+    if (isEnd) {
+      const startTag = currentStack.pop() as Node;
       const parent = currentStack[currentStack.length - 1];
       currentChildren = parent
         ? (parent.children as Array<string | Node>)
         : nodes;
-      if (tag && tag.tagName !== newTag.tagName) {
+      if (startTag && startTag.tagName !== newTag.tagName) {
         emitError(
           lastPos - 1,
-          `close tag does not match: <${tag.tagName}></${newTag.tagName}>`
+          `start tag and end tag does not match: <${startTag.tagName}></${
+            newTag.tagName
+          }>`
         );
       }
     } else if (currentSelfCloseTag || isVoidTag(tagNameLow)) {
