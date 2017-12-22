@@ -119,6 +119,15 @@ describe("Commmon", function() {
     );
   });
 
+  it("Namespace tag name syntax", function() {
+    assert('<xml:lang value="zh-cn" />', [
+      {
+        tagName: "xml:lang",
+        properties: { value: "zh-cn" }
+      }
+    ]);
+  });
+
   it("doctype", function() {
     assert("<!DOCTYPE html>", [
       {

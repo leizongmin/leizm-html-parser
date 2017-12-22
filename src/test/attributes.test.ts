@@ -62,4 +62,17 @@ describe("Attribute values", function() {
       ]
     );
   });
+
+  it("Namespace attribute value syntax", function() {
+    assert('<svg xlink:href="hello.svg" xlink:title="hello world"></svg>', [
+      {
+        tagName: "svg",
+        properties: {
+          "xlink:href": "hello.svg",
+          "xlink:title": "hello world"
+        },
+        children: []
+      }
+    ]);
+  });
 });
