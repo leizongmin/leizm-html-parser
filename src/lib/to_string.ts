@@ -1,6 +1,23 @@
-import { NodeChildren, Properties } from './index';
+import { NodeChildren, Properties } from "./index";
 
-export function toString(nodes: NodeChildren): string {
+export interface ToStringOptions {
+  pretty?: boolean;
+  indent?: string;
+}
+
+export function toString(
+  nodes: NodeChildren,
+  options: ToStringOptions = {}
+): string {
+  options.pretty = !!options.pretty;
+  options.indent = options.pretty ? options.indent || "\t" : "";
+  if (options.pretty) {
+    nodes = prettyHtml(nodes, options.indent);
+  }
+  return nodesToString(nodes);
+}
+
+function nodesToString(nodes: NodeChildren): string {
   let html = "";
   if (nodes) {
     for (const item of nodes) {
@@ -14,7 +31,7 @@ export function toString(nodes: NodeChildren): string {
         } else if (item.children) {
           html +=
             `<${item.tagName}${propsToString(item.properties)}>` +
-            toString(item.children) +
+            nodesToString(item.children) +
             `</${item.tagName}>`;
         } else {
           html += `<${item.tagName}${propsToString(item.properties)} />`;
@@ -72,3 +89,6 @@ function escapeHtml(str: string): string {
   return ret;
 }
 
+function prettyHtml(nodes: NodeChildren, indent: string): NodeChildren {
+  return nodes;
+}

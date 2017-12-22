@@ -5,7 +5,7 @@ import { parse, toString, NodeChildren } from "../lib";
 
 function dump(input: string) {
   const { errors, nodes } = parse(input);
-  const output = toString(nodes);
+  const output = toString(nodes, { pretty: true });
   const line = "`".repeat(process.stdout.columns || 80);
   console.log(colors.cyan(line));
   console.log(colors.magenta("A"), inspect(nodes, { depth: 10, colors: true }));
