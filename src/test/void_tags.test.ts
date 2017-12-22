@@ -59,13 +59,13 @@ describe("Void tags", function() {
   });
 
   it("Custom void tags", function() {
-    assert('<A value="1" /><B value="2" />', [
+    assert('<a value="1" /><b value="2" />', [
       {
-        tagName: "A",
+        tagName: "a",
         properties: { value: "1" }
       },
       {
-        tagName: "B",
+        tagName: "b",
         properties: { value: "2" }
       }
     ]);

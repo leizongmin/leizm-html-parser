@@ -56,9 +56,8 @@ function propsToString(props?: Properties): string {
   return ret;
 }
 
-function formatPropValue(value: number | boolean | string): string {
+function formatPropValue(value: boolean | string): string {
   switch (typeof value) {
-    case "number":
     case "boolean":
       return `"${value}"`;
     default:

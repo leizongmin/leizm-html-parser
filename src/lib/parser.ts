@@ -1,18 +1,35 @@
+import { isVoidTag, isHtml5Tag } from "./tags";
+
 export interface Node {
+  /**
+   * tag name
+   */
   tagName: string;
+  /**
+   * properties, if don't have any properties, then properties is `undefined`
+   */
   properties?: Properties;
+  /**
+   * children array, if is a void tag, then children is `undefined`
+   */
   children?: NodeChildren;
 }
 
 export type NodeChildren = Array<Node | string>;
 
 export interface ErrorMessage {
+  /**
+   * position offset, start from 0
+   */
   position: number;
+  /**
+   * error message
+   */
   message: string;
 }
 
 export interface Properties {
-  [key: string]: string | boolean | number;
+  [key: string]: string | boolean;
 }
 
 export interface Result {
@@ -20,12 +37,17 @@ export interface Result {
   nodes: NodeChildren;
 }
 
+/**
+ * parse HTML source and returns parsed Nodes
+ * @param input HTML source
+ */
 export function parse(input: string): Result {
   const S_TEXT = 0;
   const S_TAG_NAME = 1;
   const S_PROP_NAME = 2;
-  const S_PROP_VALUE = 4;
-  const S_COMMENT = 8;
+  const S_PROP_VALUE = 3;
+  const S_COMMENT = 4;
+  const S_CDATA = 5;
 
   const C_INVISIBLE_MAX = 32;
   const C_SPACE = 32; // " ".charCodeAt(0);
@@ -82,13 +104,14 @@ export function parse(input: string): Result {
   }
 
   function addTag() {
-    const tagNameLow = currentTagName.toLowerCase();
+    let tagNameLow = currentTagName.toLowerCase();
     const isEnd = tagNameLow.charCodeAt(0) === C_SLASH;
     if (isEnd) {
       currentTagName = currentTagName.slice(1);
+      tagNameLow = tagNameLow.slice(1);
     }
     const newTag: Node = {
-      tagName: currentTagName
+      tagName: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName
     };
     if (Object.keys(currentProps).length > 0) {
       newTag.properties = currentProps;
@@ -258,28 +281,4 @@ export function parse(input: string): Result {
   }
 
   return { errors, nodes };
-}
-
-function isVoidTag(name: string): boolean {
-  switch (name) {
-    case "!--":
-    case "!doctype":
-    case "area":
-    case "base":
-    case "br":
-    case "col":
-    case "embed":
-    case "hr":
-    case "img":
-    case "input":
-    case "link":
-    case "meta":
-    case "param":
-    case "source":
-    case "track":
-    case "wbr":
-      return true;
-    default:
-      return false;
-  }
 }
