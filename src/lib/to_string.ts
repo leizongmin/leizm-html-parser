@@ -24,8 +24,7 @@ function nodesToString(nodes: NodeChildren): string {
       if (typeof item === "string") {
         html += item;
       } else if (item) {
-        const tagName = item.tagName.toLocaleUpperCase();
-        switch (tagName) {
+        switch (item.tagName) {
           case "!--":
             if (item.children) {
               html += `<!--${nodesToString(item.children)}-->`;
