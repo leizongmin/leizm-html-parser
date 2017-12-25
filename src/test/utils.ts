@@ -8,9 +8,9 @@ export function dump(input: string) {
   const output = toString(nodes, { pretty: true });
   const line = "`".repeat(process.stdout.columns || 80);
   console.log(colors.cyan(line));
-  console.log(colors.magenta("A"), inspect(nodes, { depth: 10, colors: true }));
-  console.log(colors.magenta("I"), colors.blue(input));
-  console.log(colors.magenta("O"), colors.cyan(output));
+  console.log(inspect(nodes, { depth: 10, colors: true }));
+  console.log(colors.magenta("--"), colors.blue(input));
+  console.log(colors.magenta("=>"), colors.cyan(output));
   if (errors.length > 0) {
     for (const err of errors) {
       console.log(

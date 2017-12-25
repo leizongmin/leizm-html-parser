@@ -1,4 +1,9 @@
-import { isVoidTag, isHtml5Tag } from "./tags";
+import {
+  isVoidTag,
+  isHtml5Tag,
+  isRawTextTag,
+  isEscapableRawTextTag
+} from "./tags";
 
 export interface Node {
   /**
@@ -48,6 +53,7 @@ export function parse(input: string): Result {
   const S_PROP_VALUE = 3;
   const S_COMMENT = 4;
   const S_CDATA = 5;
+  const S_RAW_TEXT = 6;
 
   const C_INVISIBLE_MAX = 32;
   const C_SPACE = 32; // " ".charCodeAt(0);
@@ -85,11 +91,24 @@ export function parse(input: string): Result {
     return children[children.length - 1];
   }
 
+  function lastNode() {
+    return currentStack[currentStack.length - 1];
+  }
+
+  function popNodeStack() {
+    const tag = currentStack.pop() as Node;
+    const parent = currentStack[currentStack.length - 1];
+    currentChildren = parent
+      ? (parent.children as Array<string | Node>)
+      : nodes;
+    return { tag, parent };
+  }
+
   function getBuf(pos: number) {
     return input.slice(lastPos, pos);
   }
 
-  function changeState(newState: number, pos: number) {
+  function changeState(newState: number, pos: number = lastPos) {
     state = newState;
     lastPos = pos;
   }
@@ -105,7 +124,7 @@ export function parse(input: string): Result {
     }
   }
 
-  function addTag() {
+  function addTag(): number {
     let tagNameLow = currentTagName.toLowerCase();
     const isEnd = tagNameLow.charCodeAt(0) === C_SLASH;
     if (isEnd) {
@@ -120,15 +139,11 @@ export function parse(input: string): Result {
     }
 
     if (isEnd) {
-      const startTag = currentStack.pop() as Node;
-      const parent = currentStack[currentStack.length - 1];
-      currentChildren = parent
-        ? (parent.children as Array<string | Node>)
-        : nodes;
-      if (startTag && startTag.tagName !== newTag.tagName) {
+      const { tag, parent } = popNodeStack();
+      if (tag && tag.tagName !== newTag.tagName) {
         emitError(
           lastPos - 1,
-          `start tag and end tag does not match: <${startTag.tagName}></${
+          `start tag and end tag does not match: <${tag.tagName}></${
             newTag.tagName
           }>`
         );
@@ -146,6 +161,12 @@ export function parse(input: string): Result {
     currentTagName = "";
     currentProps = {};
     currentSelfCloseTag = false;
+
+    if (isRawTextTag(tagNameLow)) {
+      return S_RAW_TEXT;
+    } else {
+      return S_TEXT;
+    }
   }
 
   function addProp(pos: number, noValue: boolean = false) {
@@ -185,8 +206,7 @@ export function parse(input: string): Result {
           continue;
         } else if (c === C_GT) {
           currentTagName = getBuf(pos);
-          addTag();
-          changeState(S_TEXT, pos + 1);
+          changeState(addTag(), pos + 1);
           continue;
         } else if (c === C_MINUS) {
           const pc = input.charCodeAt(pos - 1);
@@ -237,15 +257,13 @@ export function parse(input: string): Result {
         } else if (c === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos, true);
-          addTag();
-          changeState(S_TEXT, pos + 1);
+          changeState(addTag(), pos + 1);
           continue;
         } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos, true);
           currentSelfCloseTag = true;
-          addTag();
-          changeState(S_TEXT, pos + 2);
+          changeState(addTag(), pos + 2);
           continue;
         }
         break;
@@ -261,8 +279,7 @@ export function parse(input: string): Result {
           continue;
         } else if (c === C_GT) {
           addProp(pos);
-          addTag();
-          changeState(S_TEXT, pos + 1);
+          changeState(addTag(), pos + 1);
           continue;
         }
         break;
@@ -274,8 +291,7 @@ export function parse(input: string): Result {
           if (pc === pc2 && pc === C_MINUS) {
             currentProps.comment = getBuf(pos - 2);
             currentSelfCloseTag = true;
-            addTag();
-            changeState(S_TEXT, pos + 1);
+            changeState(addTag(), pos + 1);
             continue;
           }
         }
@@ -288,9 +304,23 @@ export function parse(input: string): Result {
           if (pc === pc2 && pc === C_SQUARE_BRACKET_R) {
             currentProps.data = getBuf(pos - 2);
             currentSelfCloseTag = true;
-            addTag();
-            changeState(S_TEXT, pos + 1);
+            changeState(addTag(), pos + 1);
             continue;
+          }
+        }
+        break;
+
+      case S_RAW_TEXT:
+        if (c === C_LT) {
+          const nc = input.charCodeAt(pos + 1);
+          if (nc === C_SLASH) {
+            const tag = lastNode();
+            const end = pos + 2 + tag.tagName.length;
+            if (input.slice(pos + 2, end).toLowerCase() === tag.tagName) {
+              tag.children = [getBuf(pos)];
+              popNodeStack();
+              changeState(S_TEXT, end + 1);
+            }
           }
         }
         break;

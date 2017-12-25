@@ -4,7 +4,7 @@
   "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
   "scripts": {
-    "test": "mocha --require ts-node/register src/test/**/*.ts",
+    "test": "mocha --require ts-node/register src/test/**/*.test.ts",
     "compile": "rm -rf dist && tsc",
     "prepublish": "npm run compile && npm run test"
   },
