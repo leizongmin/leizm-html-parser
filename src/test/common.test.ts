@@ -55,7 +55,7 @@ describe("Commmon", function() {
 
     assert("<!doctype html>", [
       {
-        tagName: "!doctype",
+        tagName: "!DOCTYPE",
         properties: {
           html: true
         }
@@ -113,7 +113,7 @@ describe("Commmon", function() {
   });
 
   it("DOCTYPE", function() {
-    assert("<!DOCTYPE html>", [
+    assert("<!doctype html>", [
       {
         tagName: "!DOCTYPE",
         properties: {
@@ -122,7 +122,7 @@ describe("Commmon", function() {
       }
     ]);
 
-    assert('<!DOCTYPE html SYSTEM "about:legacy-compat">', [
+    assert('<!doctype html SYSTEM "about:legacy-compat">', [
       {
         tagName: "!DOCTYPE",
         properties: {
@@ -133,7 +133,7 @@ describe("Commmon", function() {
       }
     ]);
 
-    assert("<!DOCTYPE html SYSTEM 'about:legacy-compat'>", [
+    assert("<!doctype html SYSTEM 'about:legacy-compat'>", [
       {
         tagName: "!DOCTYPE",
         properties: {

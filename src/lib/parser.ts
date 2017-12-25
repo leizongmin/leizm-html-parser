@@ -136,6 +136,9 @@ export function parse(input: string): Result {
     if (Object.keys(currentProps).length > 0) {
       newTag.properties = currentProps;
     }
+    if (tagNameLow === "!doctype") {
+      newTag.tagName = "!DOCTYPE";
+    }
 
     if (isEnd) {
       const { tag, parent } = popNodeStack();
