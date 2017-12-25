@@ -24,6 +24,118 @@
 
 Fast HTML parser written in pure JavaScript
 
+## Installation
+
+```bash
+npm install @leizm/html-parser --save
+```
+
+## Usage
+
+```typescript
+import * as html from "@leizm/html-parser";
+
+const { errors, nodes } = html.parse(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Hello, world! <small>by @leizm/html-parser</small></h1>
+  <p>Fast HTML parser written in pure JavaScript</p>
+</body>
+</html>`);
+
+console.log(html.toString(nodes));
+```
+
+the result of `html.parse()` will be:
+
+```json
+{
+  "errors": [],
+  "nodes": [
+    { "tagName": "!DOCTYPE", "properties": { "html": true } },
+    "\n",
+    {
+      "tagName": "html",
+      "properties": { "lang": "en" },
+      "children": [
+        "\n",
+        {
+          "tagName": "head",
+          "children": [
+            "\n  ",
+            { "tagName": "meta", "properties": { "charset": "UTF-8" } },
+            "\n  ",
+            {
+              "tagName": "meta",
+              "properties": {
+                "name": "viewport",
+                "content": "width=device-width, initial-scale=1.0"
+              }
+            },
+            "\n  ",
+            {
+              "tagName": "meta",
+              "properties": {
+                "http-equiv": "X-UA-Compatible",
+                "content": "ie=edge"
+              }
+            },
+            "\n  ",
+            { "tagName": "title", "children": ["Document"] },
+            "\n"
+          ]
+        },
+        "\n",
+        {
+          "tagName": "body",
+          "children": [
+            "\n  ",
+            {
+              "tagName": "h1",
+              "children": [
+                "Hello, world! ",
+                { "tagName": "small", "children": ["by @leizm/html-parser"] }
+              ]
+            },
+            "\n  ",
+            {
+              "tagName": "p",
+              "children": ["Fast HTML parser written in pure JavaScript"]
+            },
+            "\n"
+          ]
+        },
+        "\n"
+      ]
+    }
+  ]
+}
+```
+
+the result of `html.toString()` will be:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+<body>
+  <h1>Hello, world! <small>by @leizm/html-parser</small></h1>
+  <p>Fast HTML parser written in pure JavaScript</p>
+</body>
+</html>
+```
+
 ## License
 
 ```text
