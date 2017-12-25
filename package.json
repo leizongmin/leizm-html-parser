@@ -4,7 +4,8 @@
   "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
   "scripts": {
-    "test": "mocha --require ts-node/register src/test/**/*.test.ts",
+    "test": "npm run compile && mocha dist/test/**/*.test.js",
+    "test-fast": "mocha --require ts-node/register src/test/**/*.test.ts",
     "test-cov": "nyc --reporter=lcov mocha --require ts-node/register src/test/**/*.test.ts && nyc report",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "compile": "rm -rf dist && tsc",
