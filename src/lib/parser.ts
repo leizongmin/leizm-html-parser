@@ -87,8 +87,7 @@ export function parse(input: string): Result {
   }
 
   function lastChildNode() {
-    const children = currentChildren as Node[];
-    return children[children.length - 1];
+    return currentChildren[currentChildren.length - 1] as Node;
   }
 
   function lastNode() {
@@ -289,9 +288,10 @@ export function parse(input: string): Result {
           const pc = input.charCodeAt(pos - 1);
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_MINUS) {
-            currentProps.comment = getBuf(pos - 2);
+            const children = [getBuf(pos - 2)];
             currentSelfCloseTag = true;
             changeState(addTag(), pos + 1);
+            lastChildNode().children = children;
             continue;
           }
         }
@@ -302,9 +302,10 @@ export function parse(input: string): Result {
           const pc = input.charCodeAt(pos - 1);
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_SQUARE_BRACKET_R) {
-            currentProps.data = getBuf(pos - 2);
+            const children = [getBuf(pos - 2)];
             currentSelfCloseTag = true;
             changeState(addTag(), pos + 1);
+            lastChildNode().children = children;
             continue;
           }
         }
@@ -332,8 +333,9 @@ export function parse(input: string): Result {
 
   switch (state) {
     case S_COMMENT:
-      currentProps.comment = getBuf(len);
+      currentSelfCloseTag = true;
       addTag();
+      lastChildNode().children = [getBuf(len)];
       break;
     default:
       addText(len);

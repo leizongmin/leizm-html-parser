@@ -27,16 +27,16 @@ function nodesToString(nodes: NodeChildren): string {
         const tagName = item.tagName.toLocaleUpperCase();
         switch (tagName) {
           case "!--":
-            if (item.properties) {
-              html += `<!--${item.properties.comment}-->`;
+            if (item.children) {
+              html += `<!--${nodesToString(item.children)}-->`;
             }
             break;
           case "!DOCTYPE":
             html += `<${item.tagName}${propsToString(item.properties)}>`;
             break;
           case "![CDATA[":
-            if (item.properties) {
-              html += `<![CDATA[${item.properties.data}]]>`;
+            if (item.children) {
+              html += `<![CDATA[${nodesToString(item.children)}]]>`;
             }
             break;
           default:

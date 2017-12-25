@@ -8,9 +8,7 @@ describe("CDATA sections", function() {
         children: [
           {
             tagName: "![CDATA[",
-            properties: {
-              data: "x<y"
-            }
+            children: ["x<y"]
           }
         ]
       }
@@ -24,9 +22,7 @@ describe("CDATA sections", function() {
         children: [
           {
             tagName: "![CDATA[",
-            properties: {
-              data: " <![CDATA[ <b>hello</b> "
-            }
+            children: [" <![CDATA[ <b>hello</b> "]
           }
         ]
       }

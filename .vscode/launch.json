@@ -24,6 +24,24 @@
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
+      "name": "Mocha File",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "-u",
+        "tdd",
+        "--timeout",
+        "999999",
+        "--colors",
+        "--require",
+        "ts-node/register",
+        "${file}"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "protocol": "inspector",
+      "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/dist/lib/index.js",
       "preLaunchTask": "tsc: build - tsconfig.json",

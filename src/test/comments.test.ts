@@ -6,19 +6,17 @@ describe("Comments", function() {
       "this is ",
       {
         tagName: "!--",
-        properties: {
-          comment: "comments<a href=#>link</a><!-- hello "
-        }
+        children: ["comments<a href=#>link</a><!-- hello "]
       },
       " end"
     ]);
   });
 
-  it('Nesting', function () {
+  it("Nesting", function() {
     assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
       {
         tagName: "!--",
-        properties: { comment: "\nThis is a comment\n" }
+        children: ["\nThis is a comment\n"]
       },
       "\n",
       {
@@ -27,8 +25,7 @@ describe("Comments", function() {
       },
       {
         tagName: "!--",
-        properties: { comment: "unexpected" },
-        children: []
+        children: ["unexpected"]
       }
     ]);
   });
