@@ -14,7 +14,7 @@
 [coveralls-url]: https://coveralls.io/r/leizongmin/leizm-html-parser?branch=master
 [david-image]: https://img.shields.io/david/leizongmin/leizm-html-parser.svg?style=flat-square
 [david-url]: https://david-dm.org/leizongmin/leizm-html-parser
-[node-image]: https://img.shields.io/badge/node.js-%3E=_4.0-green.svg?style=flat-square
+[node-image]: https://img.shields.io/badge/node.js-%3E=_6.0-green.svg?style=flat-square
 [node-url]: http://nodejs.org/download/
 [download-image]: https://img.shields.io/npm/dm/@leizm/html-parser.svg?style=flat-square
 [download-url]: https://npmjs.org/package/@leizm/html-parser
