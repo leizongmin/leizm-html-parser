@@ -5,14 +5,27 @@
   "main": "dist/lib/index.js",
   "scripts": {
     "test": "mocha --require ts-node/register src/test/**/*.test.ts",
+    "test-cov": "nyc --reporter=lcov mocha --require ts-node/register src/test/**/*.test.ts && nyc report",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "compile": "rm -rf dist && tsc",
     "prepublish": "npm run compile && npm run test"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leizongmin/leizm-html-parser.git"
   },
-  "keywords": ["html", "parser"],
+  "keywords": [
+    "html",
+    "parser"
+  ],
   "author": "Zongmin Lei <leizongmin@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -25,7 +38,9 @@
     "@types/mocha": "^2.2.44",
     "chai": "^4.1.2",
     "colors": "^1.1.2",
+    "coveralls": "^3.0.0",
     "mocha": "^4.0.1",
+    "nyc": "^11.4.1",
     "prettier": "^1.9.2",
     "ts-node": "^4.0.2",
     "typescript": "^2.6.2"
