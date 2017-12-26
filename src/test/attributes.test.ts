@@ -75,4 +75,13 @@ describe("Attribute values", function() {
       }
     ]);
   });
+
+  it("Attribute value includes <>", function() {
+    assert('<tag attr="<>" />', [
+      {
+        tagName: "tag",
+        properties: { attr: "<>" }
+      }
+    ]);
+  });
 });

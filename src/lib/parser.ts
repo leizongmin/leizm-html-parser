@@ -279,7 +279,7 @@ export function parse(input: string): Result {
           addProp(pos);
           changeState(S_PROP_NAME, pos + 1);
           continue;
-        } else if (c === C_GT) {
+        } else if (currentPropQuote === 0 && c === C_GT) {
           addProp(pos);
           changeState(addTag(), pos + 1);
           continue;
