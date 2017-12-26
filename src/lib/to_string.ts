@@ -61,20 +61,11 @@ function propsToString(props?: Properties): string {
       if (props[name] === true) {
         ret += ` ${name}`;
       } else {
-        ret += ` ${name}=${formatPropValue(props[name])}`;
+        ret += ` ${name}="${escapeHtml(props[name] as string)}"`;
       }
     }
   }
   return ret;
-}
-
-function formatPropValue(value: boolean | string): string {
-  switch (typeof value) {
-    case "boolean":
-      return `"${value}"`;
-    default:
-      return `"${escapeHtml(value as string)}"`;
-  }
 }
 
 function escapeHtml(str: string): string {

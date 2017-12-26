@@ -84,4 +84,13 @@ describe("Attribute values", function() {
       }
     ]);
   });
+
+  it("Obnormal attributes", function() {
+    assert("<tag abc= cdef />", [
+      {
+        tagName: "tag",
+        properties: { abc: true, cdef: true }
+      }
+    ]);
+  });
 });

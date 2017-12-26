@@ -330,7 +330,7 @@ export function parse(input: string): Result {
         break;
 
       default:
-        throw new Error(`invalid state`);
+        throw new Error(`fatal: invalid state ${state}`);
     }
   }
 
