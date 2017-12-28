@@ -80,7 +80,7 @@ export function parse(input: string): Result {
   let currentProps: Properties = {};
   let currentPropQuote = 0;
   let currentPropName = "";
-  let currentSelfCloseTag = false;
+  let currentSelfClosing = false;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
@@ -150,7 +150,7 @@ export function parse(input: string): Result {
           }>`
         );
       }
-    } else if (currentSelfCloseTag || isVoidTag(tagNameLow)) {
+    } else if (currentSelfClosing || isVoidTag(tagNameLow)) {
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);
@@ -162,7 +162,7 @@ export function parse(input: string): Result {
 
     currentTagName = "";
     currentProps = {};
-    currentSelfCloseTag = false;
+    currentSelfClosing = false;
 
     if (isRawTextTag(tagNameLow)) {
       return S_RAW_TEXT;
@@ -264,7 +264,7 @@ export function parse(input: string): Result {
         } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos, true);
-          currentSelfCloseTag = true;
+          currentSelfClosing = true;
           changeState(addTag(), pos + 2);
           continue;
         }
@@ -292,7 +292,7 @@ export function parse(input: string): Result {
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_MINUS) {
             const children = [getBuf(pos - 2)];
-            currentSelfCloseTag = true;
+            currentSelfClosing = true;
             changeState(addTag(), pos + 1);
             lastChildNode().children = children;
             continue;
@@ -306,7 +306,7 @@ export function parse(input: string): Result {
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_SQUARE_BRACKET_R) {
             const children = [getBuf(pos - 2)];
-            currentSelfCloseTag = true;
+            currentSelfClosing = true;
             changeState(addTag(), pos + 1);
             lastChildNode().children = children;
             continue;
@@ -336,7 +336,7 @@ export function parse(input: string): Result {
 
   switch (state) {
     case S_COMMENT:
-      currentSelfCloseTag = true;
+      currentSelfClosing = true;
       addTag();
       lastChildNode().children = [getBuf(len)];
       break;
