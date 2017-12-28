@@ -93,7 +93,6 @@ export function isHtml5Tag(name: string): boolean {
     case "acronym":
     case "address":
     case "applet":
-    case "object":
     case "area":
     case "article":
     case "aside":
@@ -116,7 +115,6 @@ export function isHtml5Tag(name: string): boolean {
     case "col":
     case "colgroup":
     case "datalist":
-    case "input":
     case "dd":
     case "del":
     case "details":
@@ -135,7 +133,12 @@ export function isHtml5Tag(name: string): boolean {
     case "form":
     case "frame":
     case "frameset":
-    case "h1> to <h6":
+    case "h1":
+    case "h2":
+    case "h3":
+    case "h4":
+    case "h5":
+    case "h6":
     case "head":
     case "header":
     case "hgroup":
@@ -149,9 +152,7 @@ export function isHtml5Tag(name: string): boolean {
     case "kbd":
     case "keygen":
     case "label":
-    case "input":
     case "legend":
-    case "fieldset":
     case "li":
     case "link":
     case "map":
@@ -182,15 +183,12 @@ export function isHtml5Tag(name: string): boolean {
     case "select":
     case "small":
     case "source":
-    case "audio":
-    case "video":
     case "span":
     case "strike":
     case "strong":
     case "style":
     case "sub":
     case "summary":
-    case "details":
     case "sup":
     case "table":
     case "tbody":
@@ -203,134 +201,12 @@ export function isHtml5Tag(name: string): boolean {
     case "title":
     case "tr":
     case "track":
-    case "audio":
-    case "video":
     case "tt":
     case "u":
     case "ul":
     case "var":
     case "video":
     case "wbr":
-    case "a":
-    case "article":
-    case "aside":
-    case "body":
-    case "br":
-    case "details":
-    case "div":
-    case "h1> to <h6":
-    case "head":
-    case "header":
-    case "hgroup":
-    case "hr":
-    case "html":
-    case "footer":
-    case "nav":
-    case "p":
-    case "section":
-    case "span":
-    case "summary":
-    case "details":
-    case "base":
-    case "basefont":
-    case "link":
-    case "meta":
-    case "style":
-    case "title":
-    case "button":
-    case "datalist":
-    case "input":
-    case "fieldset":
-    case "form":
-    case "input":
-    case "keygen":
-    case "label":
-    case "input":
-    case "legend":
-    case "fieldset":
-    case "meter":
-    case "optgroup":
-    case "option":
-    case "select":
-    case "textarea":
-    case "abbr":
-    case "acronym":
-    case "address":
-    case "b":
-    case "bdi":
-    case "bdo":
-    case "big":
-    case "blockquote":
-    case "center":
-    case "cite":
-    case "code":
-    case "del":
-    case "dfn":
-    case "em":
-    case "font":
-    case "i":
-    case "ins":
-    case "kbd":
-    case "mark":
-    case "output":
-    case "pre":
-    case "progress":
-    case "q":
-    case "rp":
-    case "rt":
-    case "ruby":
-    case "s":
-    case "samp":
-    case "small":
-    case "strike":
-    case "strong":
-    case "sub":
-    case "sup":
-    case "tt":
-    case "u":
-    case "var":
-    case "wbr":
-    case "dd":
-    case "dir":
-    case "dl":
-    case "dt":
-    case "li":
-    case "ol":
-    case "menu":
-    case "ul":
-    case "caption":
-    case "col":
-    case "colgroup":
-    case "table":
-    case "tbody":
-    case "td":
-    case "tfoot":
-    case "thead":
-    case "th":
-    case "tr":
-    case "noscript":
-    case "script":
-    case "applet":
-    case "object":
-    case "area":
-    case "audio":
-    case "canvas":
-    case "embed":
-    case "figcaption":
-    case "figure":
-    case "frame":
-    case "frameset":
-    case "iframe":
-    case "img":
-    case "map":
-    case "noframes":
-    case "object":
-    case "param":
-    case "source":
-    case "audio":
-    case "video":
-    case "time":
-    case "video":
       return true;
     default:
       return false;

@@ -1,4 +1,5 @@
 import { NodeChildren, Properties } from "./index";
+import { isVoidTag } from "./tags";
 
 export interface ToStringOptions {
   pretty?: boolean;
@@ -44,6 +45,8 @@ function nodesToString(nodes: NodeChildren): string {
                 `<${item.tagName}${propsToString(item.properties)}>` +
                 nodesToString(item.children) +
                 `</${item.tagName}>`;
+            } else if (isVoidTag(item.tagName)) {
+              html += `<${item.tagName}${propsToString(item.properties)}>`;
             } else {
               html += `<${item.tagName}${propsToString(item.properties)} />`;
             }

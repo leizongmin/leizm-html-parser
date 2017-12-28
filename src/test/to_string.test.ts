@@ -38,13 +38,13 @@ describe("toString()", function() {
         }
       ])
     ).to.equal(
-      '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Hello</title></head><body><h1>Hello, world!</h1></body></html>'
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Hello</title></head><body><h1>Hello, world!</h1></body></html>'
     );
   });
 
   it("toString(parse())", function() {
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Hello</title></head><body><h1>Hello, world!</h1></body></html>';
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Hello</title></head><body><h1>Hello, world!</h1></body></html>';
     expect(toString(parse(html).nodes)).to.equal(html);
   });
 
@@ -75,5 +75,17 @@ describe("toString()", function() {
     expect(toString(parse(html).nodes)).to.equal(
       '<a href="&apos;&lt;hello&gt;&apos;">link</a>'
     );
+  });
+
+  it("Void tags has not slash <img src=#>", function() {
+    const html = "<img src=#1><img src=#2 />";
+    expect(toString(parse(html).nodes)).to.equal(
+      '<img src="#1"><img src="#2">'
+    );
+  });
+
+  it("Self-closing tags keep slash <tag a=# />", function() {
+    const html = "<tag a=# /><tag b=# />";
+    expect(toString(parse(html).nodes)).to.equal('<tag a="#" /><tag b="#" />');
   });
 });
