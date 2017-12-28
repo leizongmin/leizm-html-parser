@@ -88,4 +88,9 @@ describe("toString()", function() {
     const html = "<tag a=# /><tag b=# />";
     expect(toString(parse(html).nodes)).to.equal('<tag a="#" /><tag b="#" />');
   });
+
+  it("Non-void tags with self-closing <a /><b />", function() {
+    const html = "<a /><b />";
+    expect(toString(parse(html).nodes)).to.equal("<a></a><b></b>");
+  });
 });

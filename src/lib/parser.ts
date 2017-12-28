@@ -1,5 +1,6 @@
 import {
   isVoidTag,
+  isNonVoidTag,
   isHtml5Tag,
   isRawTextTag,
   isEscapableRawTextTag
@@ -150,7 +151,12 @@ export function parse(input: string): Result {
           }>`
         );
       }
-    } else if (currentSelfClosing || isVoidTag(tagNameLow)) {
+    } else if (currentSelfClosing) {
+      if (isNonVoidTag(tagNameLow)) {
+        newTag.children = [];
+      }
+      pushToCurrentChildren(newTag);
+    } else if (isVoidTag(tagNameLow)) {
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);

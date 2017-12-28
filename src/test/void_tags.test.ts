@@ -59,14 +59,29 @@ describe("Void tags", function() {
   });
 
   it("Custom void tags", function() {
-    assert('<a value="1" /><b value="2" />', [
+    assert('<xx value="1" /><yy value="2" />', [
       {
-        tagName: "a",
+        tagName: "xx",
         properties: { value: "1" }
       },
       {
-        tagName: "b",
+        tagName: "yy",
         properties: { value: "2" }
+      }
+    ]);
+  });
+
+  it("Non-void tags with self-closing auto add empty children", function() {
+    assert('<a value="1" /><b value="2" />', [
+      {
+        tagName: "a",
+        properties: { value: "1" },
+        children: []
+      },
+      {
+        tagName: "b",
+        properties: { value: "2" },
+        children: []
       }
     ]);
   });

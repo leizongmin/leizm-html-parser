@@ -42,6 +42,19 @@ export function isVoidTag(name: string): boolean {
 }
 
 /**
+ * Returns true if the input is a html5 tag name but not a void tag name,
+ * otherwise returns false
+ *
+ * @param name tag name in lower case
+ */
+export function isNonVoidTag(name: string): boolean {
+  if (isHtml5Tag(name) && !isVoidTag(name)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Returns true if the input is raw text tag name
  *
  * The text in raw text and escapable raw text elements must not contain any occurrences of the string "</"
