@@ -77,7 +77,7 @@ describe("toString()", function() {
     );
   });
 
-  it("Void tags has not slash <img src=#>", function() {
+  it("Void tags has no slash <img src=#>", function() {
     const html = "<img src=#1><img src=#2 />";
     expect(toString(parse(html).nodes)).to.equal(
       '<img src="#1"><img src="#2">'
