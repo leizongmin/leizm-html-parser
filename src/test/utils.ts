@@ -3,14 +3,24 @@ import { inspect } from "util";
 import * as colors from "colors";
 import { parse, toString, NodeChildren } from "../lib";
 
+export const enableDump =
+  process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1;
+
+export const PAGING = "`".repeat(process.stdout.columns || 80);
+
 export function dump(input: string) {
   const { errors, nodes } = parse(input);
   const output = toString(nodes, { pretty: true });
-  const line = "`".repeat(process.stdout.columns || 80);
-  console.log(colors.cyan(line));
+  console.log(colors.cyan(PAGING));
   console.log(inspect(nodes, { depth: 10, colors: true }));
-  console.log(colors.magenta("--"), colors.blue(input));
-  console.log(colors.magenta("=>"), colors.cyan(output));
+  console.log(
+    colors.magenta("--"),
+    (textHasMulitLines(input) ? "\n" : "") + colors.blue(input)
+  );
+  console.log(
+    colors.magenta("=>"),
+    (textHasMulitLines(output) ? "\n" : "") + colors.cyan(output)
+  );
   if (errors.length > 0) {
     for (const err of errors) {
       console.log(
@@ -20,12 +30,23 @@ export function dump(input: string) {
       );
     }
   }
-  console.log(colors.cyan(line));
+  console.log(colors.cyan(PAGING));
 }
 
 export function assert(html: string, nodes: NodeChildren) {
-  if (process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1) {
+  if (enableDump) {
     dump(html);
   }
   return expect(parse(html).nodes).to.deep.equal(nodes);
+}
+
+export function textHasMulitLines(text: string): boolean {
+  return text.split("\n").length > 1;
+}
+
+export function showInvisibleText(text: string): string {
+  return text
+    .replace(/ /g, colors.gray("·"))
+    .replace(/\t/g, colors.gray("⎯⎯⎯↣"))
+    .replace(/\n/g, colors.gray("↲") + "\n");
 }
