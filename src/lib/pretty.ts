@@ -30,7 +30,42 @@ export function prettyNodes(
         indent = options.indent;
       }
     }
-    nodes = prettyNodesWithIndent(nodes, 0, indent);
+
+    function walk(
+      nodes: NodeChildren,
+      level: number,
+      indent: string
+    ): NodeChildren {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (typeof node === "string") {
+          nodes[i] = node.replace(REG_REMOVE_SPACES, " ");
+        } else {
+          if (node.children && node.children.length > 0) {
+            node.children = walk(node.children, level + 1, indent);
+          }
+        }
+      }
+      if (
+        level &&
+        indent &&
+        !(nodes.length === 1 && typeof nodes[0] === "string")
+      ) {
+        const whiteSpaces = "\n" + indent.repeat(level);
+        for (let i = 0; i < nodes.length; i += 2) {
+          nodes.splice(i, -1, whiteSpaces);
+        }
+        nodes.push("\n" + indent.repeat(level - 1));
+      } else if (indent && level === 0) {
+        // top level
+        for (let i = 0; i < nodes.length; i += 2) {
+          nodes.splice(i, -1, "\n");
+        }
+      }
+      return nodes;
+    }
+
+    nodes = walk(nodes, 0, indent);
 
     // trim left and right spaces
     if (nodes[0] && typeof nodes[0] === "string") {
@@ -45,40 +80,6 @@ export function prettyNodes(
       if (!nodes[lastIndex]) {
         nodes.splice(lastIndex, 1);
       }
-    }
-  }
-  return nodes;
-}
-
-function prettyNodesWithIndent(
-  nodes: NodeChildren,
-  level: number,
-  indent: string
-): NodeChildren {
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    if (typeof node === "string") {
-      nodes[i] = node.replace(REG_REMOVE_SPACES, " ");
-    } else {
-      if (node.children && node.children.length > 0) {
-        node.children = prettyNodesWithIndent(node.children, level + 1, indent);
-      }
-    }
-  }
-  if (
-    level &&
-    indent &&
-    !(nodes.length === 1 && typeof nodes[0] === "string")
-  ) {
-    const whiteSpaces = "\n" + indent.repeat(level);
-    for (let i = 0; i < nodes.length; i += 2) {
-      nodes.splice(i, -1, whiteSpaces);
-    }
-    nodes.push("\n" + indent.repeat(level - 1));
-  } else if (indent && level === 0) {
-    // top level
-    for (let i = 0; i < nodes.length; i += 2) {
-      nodes.splice(i, -1, "\n");
     }
   }
   return nodes;
