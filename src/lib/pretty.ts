@@ -21,7 +21,7 @@ export function prettyNodes(
   options: PrettyOptions = {}
 ): NodeChildren {
   if (nodes.length > 0) {
-    // only when there is unless one Node, then start the pretty process
+    // only when there is unless one Node, then starts the pretty process
     let indent = "";
     if (options.indent) {
       if (typeof options.indent === "number") {

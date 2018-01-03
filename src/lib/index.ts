@@ -9,3 +9,4 @@
 export * from './parser';
 export * from './to_string';
 export * from './pretty';
+export * from './minify';
