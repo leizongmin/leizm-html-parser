@@ -14,11 +14,11 @@ export function dump(input: string) {
   console.log(colors.cyan(PAGING));
   console.log(inspect(nodes, { depth: 10, colors: true }));
   console.log(
-    colors.magenta("--"),
+    colors.magenta("before:"),
     (textHasMulitLines(input) ? "\n" : "") + colors.blue(input)
   );
   console.log(
-    colors.magenta("=>"),
+    colors.magenta("after: "),
     (textHasMulitLines(output) ? "\n" : "") + colors.cyan(output)
   );
   if (errors.length > 0) {

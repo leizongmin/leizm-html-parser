@@ -92,5 +92,18 @@ describe("Attribute values", function() {
         properties: { abc: true, cdef: true }
       }
     ]);
+    assert('<tag a="1"b="2"></tag>', [
+      {
+        tagName: "tag",
+        properties: { a: "1", b: "2" },
+        children: []
+      }
+    ]);
+    assert('<tag a="1"b="2"/>', [
+      {
+        tagName: "tag",
+        properties: { a: "1", b: "2" }
+      }
+    ]);
   });
 });
