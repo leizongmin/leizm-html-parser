@@ -1,15 +1,15 @@
 import { expect } from "chai";
 import { inspect } from "util";
 import * as colors from "colors";
-import { parse, toString, NodeChildren } from "../lib";
+import { parse, ParseOptions, toString, NodeChildren } from "../lib";
 
 export const enableDump =
   process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1;
 
 export const PAGING = "`".repeat(process.stdout.columns || 80);
 
-export function dump(input: string) {
-  const { errors, nodes } = parse(input);
+export function dump(input: string, options?: ParseOptions) {
+  const { errors, nodes } = parse(input, options);
   const output = toString(nodes, { pretty: true });
   console.log(colors.cyan(PAGING));
   console.log(inspect(nodes, { depth: 10, colors: true }));
@@ -33,11 +33,19 @@ export function dump(input: string) {
   console.log(colors.cyan(PAGING));
 }
 
-export function assert(html: string, nodes: NodeChildren) {
+export function assert(
+  html: string,
+  nodes: NodeChildren,
+  options: ParseOptions = {}
+) {
   if (enableDump) {
-    dump(html);
+    dump(html, options);
   }
-  return expect(parse(html).nodes).to.deep.equal(nodes);
+  const ret = parse(html, options);
+  expect(ret.nodes).to.deep.equal(nodes);
+  if ("xml" in options) {
+    expect(ret.xml).to.equal(options.xml);
+  }
 }
 
 export function textHasMulitLines(text: string): boolean {

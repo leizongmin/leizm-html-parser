@@ -41,13 +41,21 @@ export interface Properties {
 export interface Result {
   errors: ErrorMessage[];
   nodes: NodeChildren;
+  xml: boolean;
+}
+
+export interface ParseOptions {
+  /**
+   * parse source in XML document mode
+   */
+  xml?: boolean;
 }
 
 /**
  * parse HTML source and returns parsed Nodes
  * @param input HTML source
  */
-export function parse(input: string): Result {
+export function parse(input: string, options: ParseOptions = {}): Result {
   const S_TEXT = 0;
   const S_TAG_NAME = 1;
   const S_PROP_NAME = 2;
@@ -82,7 +90,7 @@ export function parse(input: string): Result {
   let currentPropQuote = 0;
   let currentPropName = "";
   let currentSelfClosing = false;
-  let isXMLMode = false;
+  let isXMLMode = options.xml ? true : false;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
@@ -370,5 +378,5 @@ export function parse(input: string): Result {
       addText(len);
   }
 
-  return { errors, nodes };
+  return { errors, nodes, xml: !!isXMLMode };
 }

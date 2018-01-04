@@ -2,10 +2,6 @@ import { assert } from "./utils";
 
 describe("XML document", function() {
   it("Normal XML", function() {
-    // assert(
-    //   `<?xml version="1.0" encoding="UTF-8"?><rdf:RDF><channel rdf:about="/"><title>A</title><link>/</link></channel></rdf:RDF>`,
-    //   []
-    // );
     assert(
       `<?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:ev="http://purl.org/rss/1.0/modules/event/"
@@ -116,6 +112,25 @@ describe("XML document", function() {
           ]
         }
       ]
+    );
+  });
+
+  it("on HTML mode, <link> is void tag", function() {
+    assert("<link>hello</link>", [{ tagName: "link" }, "hello"]);
+  });
+
+  it("on XML mode, <link> contains body", function() {
+    assert(
+      "<link>hello</link>",
+      [
+        {
+          tagName: "link",
+          children: ["hello"]
+        }
+      ],
+      {
+        xml: true
+      }
     );
   });
 });
