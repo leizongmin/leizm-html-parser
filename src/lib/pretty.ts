@@ -1,4 +1,4 @@
-import { NodeChildren, parse, toString } from "./index";
+import { NodeChildren, TextNode, TagNode, parse, toString } from "./index";
 
 const REG_REMOVE_SPACES = /^\s+|\s+$/g;
 
@@ -37,29 +37,31 @@ export function prettyNodes(
       indent: string
     ): NodeChildren {
       for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        if (typeof node === "string") {
-          nodes[i] = node.replace(REG_REMOVE_SPACES, " ");
+        const item = nodes[i];
+        if (item.type === "text") {
+          const textNode = item as TextNode;
+          textNode.text = textNode.text.replace(REG_REMOVE_SPACES, " ");
         } else {
-          if (node.children && node.children.length > 0) {
-            node.children = walk(node.children, level + 1, indent);
+          const tagNode = item as TagNode;
+          if (tagNode.children && tagNode.children.length > 0) {
+            tagNode.children = walk(tagNode.children, level + 1, indent);
           }
         }
       }
       if (
         level &&
         indent &&
-        !(nodes.length === 1 && typeof nodes[0] === "string")
+        !(nodes.length === 1 && nodes[0].type === "text")
       ) {
         const whiteSpaces = "\n" + indent.repeat(level);
         for (let i = 0; i < nodes.length; i += 2) {
-          nodes.splice(i, -1, whiteSpaces);
+          nodes.splice(i, -1, { type: "text", text: whiteSpaces });
         }
-        nodes.push("\n" + indent.repeat(level - 1));
+        nodes.push({ type: "text", text: "\n" + indent.repeat(level - 1) });
       } else if (indent && level === 0) {
         // top level
         for (let i = 0; i < nodes.length; i += 2) {
-          nodes.splice(i, -1, "\n");
+          nodes.splice(i, -1, { type: "text", text: "\n" });
         }
       }
       return nodes;
@@ -68,15 +70,17 @@ export function prettyNodes(
     nodes = walk(nodes, 0, indent);
 
     // trim left and right spaces
-    if (nodes[0] && typeof nodes[0] === "string") {
-      nodes[0] = nodes[0].toString().trimLeft();
+    if (nodes[0] && nodes[0].type === "text") {
+      const textNode = nodes[0] as TextNode;
+      textNode.text = textNode.text.trimLeft();
       if (!nodes[0]) {
         nodes.splice(0, 1);
       }
     }
     const lastIndex = nodes.length - 1;
-    if (nodes[lastIndex] && typeof nodes[lastIndex] === "string") {
-      nodes[lastIndex] = nodes[lastIndex].toString().trimRight();
+    if (nodes[lastIndex] && nodes[lastIndex].type === "text") {
+      const textNode = nodes[lastIndex] as TextNode;
+      textNode.text = textNode.text.trimRight();
       if (!nodes[lastIndex]) {
         nodes.splice(lastIndex, 1);
       }

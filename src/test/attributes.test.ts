@@ -4,7 +4,8 @@ describe("Attribute values", function() {
   it("Empty attribute syntax", function() {
     assert("<tag a b hello world />", [
       {
-        tagName: "tag",
+        type: 'tag',
+        name: "tag",
         properties: {
           a: true,
           b: true,
@@ -18,7 +19,8 @@ describe("Attribute values", function() {
   it("Unquoted attribute value syntax", function() {
     assert("<input type=image value=yes src=http://example.com title=button>", [
       {
-        tagName: "input",
+        type: 'tag',
+        name: "input",
         properties: {
           src: "http://example.com",
           title: "button",
@@ -34,7 +36,8 @@ describe("Attribute values", function() {
       "<input type='image' value='yes' src='http://example.com \" space' title='image button'>",
       [
         {
-          tagName: "input",
+          type: 'tag',
+          name: "input",
           properties: {
             src: 'http://example.com " space',
             title: "image button",
@@ -51,7 +54,8 @@ describe("Attribute values", function() {
       '<input type="image" value="yes" src="http://example.com \' space" title="image button">',
       [
         {
-          tagName: "input",
+          type: 'tag',
+          name: "input",
           properties: {
             src: "http://example.com ' space",
             title: "image button",
@@ -66,7 +70,8 @@ describe("Attribute values", function() {
   it("Namespace attribute value syntax", function() {
     assert('<svg xlink:href="hello.svg" xlink:title="hello world"></svg>', [
       {
-        tagName: "svg",
+        type: 'tag',
+        name: "svg",
         properties: {
           "xlink:href": "hello.svg",
           "xlink:title": "hello world"
@@ -79,7 +84,8 @@ describe("Attribute values", function() {
   it("Attribute value includes <>", function() {
     assert('<tag attr="<>" />', [
       {
-        tagName: "tag",
+        type: 'tag',
+        name: "tag",
         properties: { attr: "<>" }
       }
     ]);
@@ -88,20 +94,23 @@ describe("Attribute values", function() {
   it("Obnormal attributes", function() {
     assert("<tag abc= cdef />", [
       {
-        tagName: "tag",
+        type: 'tag',
+        name: "tag",
         properties: { abc: true, cdef: true }
       }
     ]);
     assert('<tag a="1"b="2"></tag>', [
       {
-        tagName: "tag",
+        type: 'tag',
+        name: "tag",
         properties: { a: "1", b: "2" },
         children: []
       }
     ]);
     assert('<tag a="1"b="2"/>', [
       {
-        tagName: "tag",
+        type: 'tag',
+        name: "tag",
         properties: { a: "1", b: "2" }
       }
     ]);

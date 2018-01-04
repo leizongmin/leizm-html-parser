@@ -3,29 +3,35 @@ import { assert } from "./utils";
 describe("Comments", function() {
   it("Normal", function() {
     assert("this is <!--comments<a href=#>link</a><!-- hello --> end", [
-      "this is ",
+      { type: "text", text: "this is " },
       {
-        tagName: "!--",
-        children: ["comments<a href=#>link</a><!-- hello "]
+        type: "tag",
+        name: "!--",
+        children: [
+          { type: "text", text: "comments<a href=#>link</a><!-- hello " }
+        ]
       },
-      " end"
+      { type: "text", text: " end" }
     ]);
   });
 
   it("Nesting", function() {
     assert("<!--\nThis is a comment\n-->\n<b>comment</b><!--unexpected", [
       {
-        tagName: "!--",
-        children: ["\nThis is a comment\n"]
+        type: "tag",
+        name: "!--",
+        children: [{ type: "text", text: "\nThis is a comment\n" }]
       },
-      "\n",
+      { type: "text", text: "\n" },
       {
-        tagName: "b",
-        children: ["comment"]
+        type: "tag",
+        name: "b",
+        children: [{ type: "text", text: "comment" }]
       },
       {
-        tagName: "!--",
-        children: ["unexpected"]
+        type: "tag",
+        name: "!--",
+        children: [{ type: "text", text: "unexpected" }]
       }
     ]);
   });

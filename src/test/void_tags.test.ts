@@ -6,53 +6,67 @@ describe("Void tags", function() {
       "<input disabled><area><base href='#'><br><col><embed><hr><img src='#' title='this is img'><link href='#'><meta charset='utf-8'><param name=a><source src='##'><track><wbr>",
       [
         {
-          tagName: "input",
+          type: "tag",
+          name: "input",
           properties: { disabled: true }
         },
         {
-          tagName: "area"
+          type: "tag",
+          name: "area"
         },
         {
-          tagName: "base",
+          type: "tag",
+          name: "base",
           properties: { href: "#" }
         },
         {
-          tagName: "br"
+          type: "tag",
+          name: "br"
         },
         {
-          tagName: "col"
+          type: "tag",
+          name: "col"
         },
         {
-          tagName: "embed"
+          type: "tag",
+          name: "embed"
         },
         {
-          tagName: "hr"
+          type: "tag",
+          name: "hr"
         },
         {
-          tagName: "img",
+          type: "tag",
+          name: "img",
           properties: { src: "#", title: "this is img" }
         },
         {
-          tagName: "link",
+          type: "tag",
+          name: "link",
           properties: { href: "#" }
         },
         {
-          tagName: "meta",
+          type: "tag",
+          name: "meta",
           properties: { charset: "utf-8" }
         },
         {
-          tagName: "param",
+          type: "tag",
+          name: "param",
           properties: { name: "a" }
         },
         {
-          tagName: "source",
+          type: "tag",
+          name: "source",
           properties: { src: "##" }
         },
         {
-          tagName: "track"
+          type: "tag",
+          name: "track"
         },
         {
-          tagName: "wbr"
+          type: "tag",
+          name: "wbr"
         }
       ]
     );
@@ -61,11 +75,13 @@ describe("Void tags", function() {
   it("Custom void tags", function() {
     assert('<xx value="1" /><yy value="2" />', [
       {
-        tagName: "xx",
+        type: "tag",
+        name: "xx",
         properties: { value: "1" }
       },
       {
-        tagName: "yy",
+        type: "tag",
+        name: "yy",
         properties: { value: "2" }
       }
     ]);
@@ -74,12 +90,14 @@ describe("Void tags", function() {
   it("Non-void tags with self-closing auto add empty children", function() {
     assert('<a value="1" /><b value="2" />', [
       {
-        tagName: "a",
+        type: "tag",
+        name: "a",
         properties: { value: "1" },
         children: []
       },
       {
-        tagName: "b",
+        type: "tag",
+        name: "b",
         properties: { value: "2" },
         children: []
       }

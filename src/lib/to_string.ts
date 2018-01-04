@@ -1,4 +1,4 @@
-import { NodeChildren, Properties } from "./index";
+import { NodeChildren, Properties, TextNode, TagNode } from "./index";
 import { isVoidTag } from "./tags";
 
 export interface ToStringOptions {
@@ -22,35 +22,36 @@ function nodesToString(nodes: NodeChildren): string {
   let html = "";
   if (nodes) {
     for (const item of nodes) {
-      if (typeof item === "string") {
-        html += item;
-      } else if (item) {
-        switch (item.tagName) {
+      if (item.type === "text") {
+        html += (item as TextNode).text;
+      } else if (item.type === "tag") {
+        const tag = item as TagNode;
+        switch (tag.name) {
           case "!--":
-            if (item.children) {
-              html += `<!--${nodesToString(item.children)}-->`;
+            if (tag.children) {
+              html += `<!--${nodesToString(tag.children)}-->`;
             }
             break;
           case "!DOCTYPE":
-            html += `<${item.tagName}${propsToString(item.properties)}>`;
+            html += `<${tag.name}${propsToString(tag.properties)}>`;
             break;
           case "![CDATA[":
-            if (item.children) {
-              html += `<![CDATA[${nodesToString(item.children)}]]>`;
+            if (tag.children) {
+              html += `<![CDATA[${nodesToString(tag.children)}]]>`;
             }
             break;
           default:
-            if (item.children) {
+            if (tag.children) {
               html +=
-                `<${item.tagName}${propsToString(item.properties)}>` +
-                nodesToString(item.children) +
-                `</${item.tagName}>`;
-            } else if (isVoidTag(item.tagName)) {
-              html += `<${item.tagName}${propsToString(item.properties)}>`;
-            } else if (item.tagName === "?xml") {
-              html += `<${item.tagName}${propsToString(item.properties)} ?>`;
+                `<${tag.name}${propsToString(tag.properties)}>` +
+                nodesToString(tag.children) +
+                `</${tag.name}>`;
+            } else if (isVoidTag(tag.name)) {
+              html += `<${tag.name}${propsToString(tag.properties)}>`;
+            } else if (tag.name === "?xml") {
+              html += `<${tag.name}${propsToString(tag.properties)} ?>`;
             } else {
-              html += `<${item.tagName}${propsToString(item.properties)} />`;
+              html += `<${tag.name}${propsToString(tag.properties)} />`;
             }
         }
       }

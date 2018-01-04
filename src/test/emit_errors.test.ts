@@ -6,12 +6,18 @@ describe("Emit errors", function() {
     const { nodes, errors } = parse("<a>hello<c>world</d></b>");
     expect(nodes).to.deep.equal([
       {
-        tagName: "a",
+        start: 0,
+        end: 24,
+        type: "tag",
+        name: "a",
         children: [
-          "hello",
+          { start: 3, end: 8, type: "text", text: "hello" },
           {
-            tagName: "c",
-            children: ["world"]
+            start: 8,
+            end: 20,
+            type: "tag",
+            name: "c",
+            children: [{ start: 11, end: 16, type: "text", text: "world" }]
           }
         ]
       }

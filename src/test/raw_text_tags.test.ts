@@ -4,20 +4,27 @@ describe("Raw text tags", function() {
   it("<style>", function() {
     assert("<style>body { background: #fff; }/*</</*/</style>end", [
       {
-        tagName: "style",
-        children: ["body { background: #fff; }/*</</*/"]
+        type: "tag",
+        name: "style",
+        children: [{ type: "text", text: "body { background: #fff; }/*</</*/" }]
       },
-      "end"
+      { type: "text", text: "end" }
     ]);
 
     assert(
       '<style>a { content: "<b>hello<a>link</a></b><c>ok</c>" }</style>end',
       [
         {
-          tagName: "style",
-          children: ['a { content: "<b>hello<a>link</a></b><c>ok</c>" }']
+          type: "tag",
+          name: "style",
+          children: [
+            {
+              type: "text",
+              text: 'a { content: "<b>hello<a>link</a></b><c>ok</c>" }'
+            }
+          ]
         },
-        "end"
+        { type: "text", text: "end" }
       ]
     );
   });
@@ -26,9 +33,10 @@ describe("Raw text tags", function() {
       '<script type="text/javascript" async>alert("hello, world")</script>',
       [
         {
-          tagName: "script",
+          type: "tag",
+          name: "script",
           properties: { type: "text/javascript", async: true },
-          children: ['alert("hello, world")']
+          children: [{ type: "text", text: 'alert("hello, world")' }]
         }
       ]
     );

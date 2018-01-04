@@ -42,6 +42,18 @@
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
+      "name": "Run File",
+      "program": "${file}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "DEBUG_MODE": "1",
+        "DEBUG_INPUT": "<a a=1 b=2>hello</a>"
+      }
+    },
+    {
+      "type": "node",
+      "protocol": "inspector",
+      "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/dist/lib/index.js",
       "preLaunchTask": "tsc: build - tsconfig.json",

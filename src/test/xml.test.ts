@@ -23,12 +23,14 @@ describe("XML document", function() {
 </rdf:RDF>`,
       [
         {
-          tagName: "?xml",
+          type: "tag",
+          name: "?xml",
           properties: { version: "1.0", encoding: "UTF-8" }
         },
-        "\n",
+        { type: "text", text: "\n" },
         {
-          tagName: "rdf:RDF",
+          type: "tag",
+          name: "rdf:RDF",
           properties: {
             "xmlns:rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             xmlns: "http://purl.org/rss/1.0/",
@@ -41,74 +43,93 @@ describe("XML document", function() {
             "xmlns:admin": "http://webns.net/mvcb/"
           },
           children: [
-            "\n  ",
+            { type: "text", text: "\n  " },
             {
-              tagName: "channel",
+              type: "tag",
+              name: "channel",
               properties: {
                 "rdf:about": "https://github.com/fb55/htmlparser2/"
               },
               children: [
-                "\n    ",
+                { type: "text", text: "\n    " },
                 {
-                  tagName: "title",
+                  type: "tag",
+                  name: "title",
                   children: [
                     {
-                      tagName: "![CDATA[",
-                      children: ["A title to parse and remember"]
+                      type: "tag",
+                      name: "![CDATA[",
+                      children: [
+                        { type: "text", text: "A title to parse and remember" }
+                      ]
                     }
                   ]
                 },
-                "\n    ",
+                { type: "text", text: "\n    " },
                 {
-                  tagName: "link",
-                  children: ["https://github.com/fb55/htmlparser2/"]
-                },
-                "\n    ",
-                {
-                  tagName: "items",
+                  type: "tag",
+                  name: "link",
                   children: [
-                    "\n      ",
                     {
-                      tagName: "rdf:Seq",
+                      type: "text",
+                      text: "https://github.com/fb55/htmlparser2/"
+                    }
+                  ]
+                },
+                { type: "text", text: "\n    " },
+                {
+                  type: "tag",
+                  name: "items",
+                  children: [
+                    { type: "text", text: "\n      " },
+                    {
+                      type: "tag",
+                      name: "rdf:Seq",
                       children: [
-                        "\n        ",
+                        { type: "text", text: "\n        " },
                         {
-                          tagName: "rdf:li",
+                          type: "tag",
+                          name: "rdf:li",
                           properties: {
                             "rdf:resource":
                               "http://somefakesite/path/to/something.html"
                           }
                         },
-                        "\n      "
+                        { type: "text", text: "\n      " }
                       ]
                     },
-                    "\n    "
+                    { type: "text", text: "\n    " }
                   ]
                 },
-                "\n  "
+                { type: "text", text: "\n  " }
               ]
             },
-            "\n  ",
+            { type: "text", text: "\n  " },
             {
-              tagName: "item",
+              type: "tag",
+              name: "item",
               properties: {
                 "rdf:about": "http://somefakesite/path/to/something.html"
               },
               children: [
-                "\n    ",
+                { type: "text", text: "\n    " },
                 {
-                  tagName: "dc:type",
-                  children: ["text"]
+                  type: "tag",
+                  name: "dc:type",
+                  children: [{ type: "text", text: "text" }]
                 },
-                "\n    ",
+                { type: "text", text: "\n    " },
                 {
-                  tagName: "dcterms:issued",
-                  children: ["2011-11-04T09:34:54-07:00"]
+                  type: "tag",
+                  name: "dcterms:issued",
+                  children: [
+                    { type: "text", text: "2011-11-04T09:34:54-07:00" }
+                  ]
                 },
-                "\n  "
+                { type: "text", text: "\n  " }
               ]
             },
-            "\n"
+            { type: "text", text: "\n" }
           ]
         }
       ]
@@ -116,7 +137,10 @@ describe("XML document", function() {
   });
 
   it("on HTML mode, <link> is void tag", function() {
-    assert("<link>hello</link>", [{ tagName: "link" }, "hello"]);
+    assert("<link>hello</link>", [
+      { type: "tag", name: "link" },
+      { type: "text", text: "hello" }
+    ]);
   });
 
   it("on XML mode, <link> contains body", function() {
@@ -124,12 +148,13 @@ describe("XML document", function() {
       "<link>hello</link>",
       [
         {
-          tagName: "link",
-          children: ["hello"]
+          type: "tag",
+          name: "link",
+          children: [{ type: "text", text: "hello" }]
         }
       ],
       {
-        xml: true
+        xmlMode: true
       }
     );
   });

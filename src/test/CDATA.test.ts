@@ -4,11 +4,13 @@ describe("CDATA sections", function() {
   it("Normal", function() {
     assert("<ms><![CDATA[x<y]]></ms>", [
       {
-        tagName: "ms",
+        type: "tag",
+        name: "ms",
         children: [
           {
-            tagName: "![CDATA[",
-            children: ["x<y"]
+            type: "tag",
+            name: "![CDATA[",
+            children: [{ type: "text", text: "x<y" }]
           }
         ]
       }
@@ -18,11 +20,13 @@ describe("CDATA sections", function() {
   it("Nesting", function() {
     assert("<ms><![CDATA[ <![CDATA[ <b>hello</b> ]]></ms>", [
       {
-        tagName: "ms",
+        type: "tag",
+        name: "ms",
         children: [
           {
-            tagName: "![CDATA[",
-            children: [" <![CDATA[ <b>hello</b> "]
+            type: "tag",
+            name: "![CDATA[",
+            children: [{ type: "text", text: " <![CDATA[ <b>hello</b> " }]
           }
         ]
       }

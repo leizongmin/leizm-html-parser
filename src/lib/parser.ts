@@ -8,9 +8,31 @@ import {
 
 export interface Node {
   /**
+   * Node type
+   */
+  type: "text" | "tag";
+  /**
+   * The starts position of the source
+   */
+  start?: number;
+  /**
+   * The ends position of the source
+   */
+  end?: number;
+}
+
+export interface TextNode extends Node {
+  /**
+   * the text
+   */
+  text: string;
+}
+
+export interface TagNode extends Node {
+  /**
    * tag name
    */
-  tagName: string;
+  name: string;
   /**
    * properties, if don't have any properties, then properties is `undefined`
    */
@@ -21,7 +43,7 @@ export interface Node {
   children?: NodeChildren;
 }
 
-export type NodeChildren = Array<Node | string>;
+export type NodeChildren = Array<TextNode | TagNode>;
 
 export interface ErrorMessage {
   /**
@@ -41,14 +63,18 @@ export interface Properties {
 export interface Result {
   errors: ErrorMessage[];
   nodes: NodeChildren;
-  xml: boolean;
+  xmlMode: boolean;
 }
 
 export interface ParseOptions {
   /**
-   * parse source in XML document mode
+   * parse source on XML document mode
    */
-  xml?: boolean;
+  xmlMode?: boolean;
+  /**
+   * don't returns node position `{ start, end }`
+   */
+  removePosition?: boolean;
 }
 
 /**
@@ -83,21 +109,22 @@ export function parse(input: string, options: ParseOptions = {}): Result {
 
   let state: number = S_TEXT;
   let lastPos = 0;
-  let currentStack: Node[] = [];
+  let currentStack: TagNode[] = [];
   let currentChildren: NodeChildren = nodes;
   let currentTagName = "";
+  let currentTagPos = 0;
   let currentProps: Properties = {};
   let currentPropQuote = 0;
   let currentPropName = "";
   let currentSelfClosing = false;
-  let isXMLMode = options.xml ? true : false;
+  let xmlMode = options.xmlMode ? true : false;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
   }
 
   function lastChildNode() {
-    return currentChildren[currentChildren.length - 1] as Node;
+    return currentChildren[currentChildren.length - 1] as TagNode;
   }
 
   function lastNode() {
@@ -105,10 +132,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
   }
 
   function popNodeStack() {
-    const tag = currentStack.pop() as Node;
+    const tag = currentStack.pop() as TagNode;
     const parent = currentStack[currentStack.length - 1];
     currentChildren = parent
-      ? (parent.children as Array<string | Node>)
+      ? (parent.children as Array<TextNode | TagNode>)
       : nodes;
     return { tag, parent };
   }
@@ -122,59 +149,88 @@ export function parse(input: string, options: ParseOptions = {}): Result {
     lastPos = pos;
   }
 
-  function pushToCurrentChildren(item: Node | string) {
-    (currentChildren as Array<Node | string>).push(item);
+  function pushToCurrentChildren(item: TextNode | TagNode) {
+    if (options.removePosition) {
+      delete item.start;
+      delete item.end;
+    }
+    currentChildren.push(item);
   }
 
   function addText(pos: number) {
     const str = getBuf(pos);
     if (str) {
       // if the previous item is a text node, then combine it
-      const last = lastChildNode();
-      if (last && typeof last === "string") {
-        currentChildren[currentChildren.length - 1] = last + str;
+      const last = currentChildren[currentChildren.length - 1] as TextNode;
+      if (last && last.type === "text") {
+        last.text += str;
+        last.end = pos;
       } else {
-        pushToCurrentChildren(str);
+        const node: TextNode = {
+          start: lastPos,
+          end: pos,
+          type: "text",
+          text: str
+        };
+        pushToCurrentChildren(node);
       }
     }
   }
 
-  function addTag(): number {
+  function newTextNode(pos: number): TextNode | undefined {
+    const str = getBuf(pos);
+    if (str) {
+      return {
+        start: lastPos,
+        end: pos,
+        type: "text",
+        text: str
+      };
+    }
+  }
+
+  function addTag(endPos: number = lastPos): number {
     let tagNameLow = currentTagName.toLowerCase();
     const isEnd = tagNameLow.charCodeAt(0) === C_SLASH;
     if (isEnd) {
       currentTagName = currentTagName.slice(1);
       tagNameLow = tagNameLow.slice(1);
     }
-    const newTag: Node = {
-      tagName: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName
+    const newTag: TagNode = {
+      start: currentTagPos,
+      end: endPos,
+      type: "tag",
+      name: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName
     };
     if (Object.keys(currentProps).length > 0) {
       newTag.properties = currentProps;
     }
     if (tagNameLow === "!doctype") {
-      newTag.tagName = "!DOCTYPE";
+      newTag.name = "!DOCTYPE";
     }
     if (tagNameLow === "?xml") {
-      isXMLMode = true;
+      xmlMode = true;
     }
 
     if (isEnd) {
       const { tag, parent } = popNodeStack();
-      if (tag && tag.tagName !== newTag.tagName) {
-        emitError(
-          lastPos - 1,
-          `start tag and end tag does not match: <${tag.tagName}></${
-            newTag.tagName
-          }>`
-        );
+      if (tag) {
+        if (tag.name !== newTag.name) {
+          emitError(
+            lastPos - 1,
+            `start tag and end tag does not match: <${tag.name}></${
+              newTag.name
+            }>`
+          );
+        }
+        tag.end = newTag.end;
       }
     } else if (currentSelfClosing) {
       if (isNonVoidTag(tagNameLow)) {
         newTag.children = [];
       }
       pushToCurrentChildren(newTag);
-    } else if (!isXMLMode && isVoidTag(tagNameLow)) {
+    } else if (!xmlMode && isVoidTag(tagNameLow)) {
       pushToCurrentChildren(newTag);
     } else if (tagNameLow === "?xml") {
       if (newTag.properties) {
@@ -183,10 +239,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);
-      const last = lastChildNode() as Node;
+      const last = lastChildNode() as TagNode;
       last.children = last.children || [];
       currentStack.push(last);
-      currentChildren = last.children as Node[];
+      currentChildren = last.children as TagNode[];
     }
 
     currentTagName = "";
@@ -233,11 +289,13 @@ export function parse(input: string, options: ParseOptions = {}): Result {
       case S_TAG_NAME:
         if (c <= C_INVISIBLE_MAX) {
           currentTagName = getBuf(pos);
+          currentTagPos = lastPos - 1;
           changeState(S_PROP_NAME, pos + 1);
           continue;
         } else if (c === C_GT) {
           currentTagName = getBuf(pos);
-          changeState(addTag(), pos + 1);
+          currentTagPos = lastPos - 1;
+          changeState(addTag(pos + 1), pos + 1);
           continue;
         } else if (c === C_LT) {
           lastPos = lastPos - 1;
@@ -249,12 +307,14 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           const nc = input.charCodeAt(pos + 1);
           if (pc === C_EXCLAMATION && nc === c) {
             currentTagName = "!--";
+            currentTagPos = lastPos - 1;
             changeState(S_COMMENT, pos + 2);
             continue;
           }
         } else if (c === C_SQUARE_BRACKET_L) {
           if (pos - lastPos === 7 && getBuf(pos + 1) === "![CDATA[") {
             currentTagName = "![CDATA[";
+            currentTagPos = lastPos - 1;
             changeState(S_CDATA, pos + 1);
             continue;
           }
@@ -293,13 +353,13 @@ export function parse(input: string, options: ParseOptions = {}): Result {
         } else if (c === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos, true);
-          changeState(addTag(), pos + 1);
+          changeState(addTag(pos + 1), pos + 1);
           continue;
         } else if (c === C_SLASH && input.charCodeAt(lastPos + 1) === C_GT) {
           currentPropName = getBuf(pos);
           addProp(pos, true);
           currentSelfClosing = true;
-          changeState(addTag(), pos + 2);
+          changeState(addTag(pos + 2), pos + 2);
           continue;
         }
         break;
@@ -315,7 +375,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           continue;
         } else if (currentPropQuote === 0 && c === C_GT) {
           addProp(pos);
-          changeState(addTag(), pos + 1);
+          changeState(addTag(pos + 1), pos + 1);
           continue;
         }
         break;
@@ -325,9 +385,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           const pc = input.charCodeAt(pos - 1);
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_MINUS) {
-            const children = [getBuf(pos - 2)];
+            const text = newTextNode(pos - 2);
+            const children = text ? [text] : [];
             currentSelfClosing = true;
-            changeState(addTag(), pos + 1);
+            changeState(addTag(pos + 1), pos + 1);
             lastChildNode().children = children;
             continue;
           }
@@ -339,9 +400,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           const pc = input.charCodeAt(pos - 1);
           const pc2 = input.charCodeAt(pos - 2);
           if (pc === pc2 && pc === C_SQUARE_BRACKET_R) {
-            const children = [getBuf(pos - 2)];
+            const text = newTextNode(pos - 2);
+            const children = text ? [text] : [];
             currentSelfClosing = true;
-            changeState(addTag(), pos + 1);
+            changeState(addTag(pos + 1), pos + 1);
             lastChildNode().children = children;
             continue;
           }
@@ -353,9 +415,11 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           const nc = input.charCodeAt(pos + 1);
           if (nc === C_SLASH) {
             const tag = lastNode();
-            const end = pos + 2 + tag.tagName.length;
-            if (input.slice(pos + 2, end).toLowerCase() === tag.tagName) {
-              tag.children = [getBuf(pos)];
+            const end = pos + 2 + tag.name.length;
+            if (input.slice(pos + 2, end).toLowerCase() === tag.name) {
+              const text = newTextNode(pos);
+              const children = text ? [text] : [];
+              tag.children = children;
               popNodeStack();
               changeState(S_TEXT, end + 1);
             }
@@ -371,12 +435,27 @@ export function parse(input: string, options: ParseOptions = {}): Result {
   switch (state) {
     case S_COMMENT:
       currentSelfClosing = true;
-      addTag();
-      lastChildNode().children = [getBuf(len)];
+      addTag(len);
+      const text = newTextNode(len);
+      const children = text ? [text] : [];
+      lastChildNode().children = children;
+      break;
+    case S_TAG_NAME:
+      lastPos--;
+      addText(len);
+      break;
+    case S_CDATA:
+      lastPos -= 9;
+      addText(len);
+      break;
+    case S_PROP_NAME:
+    case S_PROP_VALUE:
+      lastPos = currentTagPos;
+      addText(len);
       break;
     default:
       addText(len);
   }
 
-  return { errors, nodes, xml: !!isXMLMode };
+  return { errors, nodes, xmlMode };
 }
