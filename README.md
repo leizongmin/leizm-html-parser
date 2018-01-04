@@ -49,76 +49,143 @@ const { errors, nodes } = html.parse(`<!DOCTYPE html>
 </body>
 </html>`);
 
+console.log({ errors, nodes });
 console.log(html.toString(nodes));
 ```
 
-the result of `html.parse()` will be:
+the result of `html.parse()` should be:
 
 ```json
 {
   "errors": [],
   "nodes": [
-    { "tagName": "!DOCTYPE", "properties": { "html": true } },
-    "\n",
     {
-      "tagName": "html",
+      "start": 0,
+      "end": 15,
+      "type": "tag",
+      "name": "!DOCTYPE",
+      "properties": { "html": true }
+    },
+    { "start": 15, "end": 16, "type": "text", "text": "\n" },
+    {
+      "start": 16,
+      "end": 365,
+      "type": "tag",
+      "name": "html",
       "properties": { "lang": "en" },
       "children": [
-        "\n",
+        { "start": 32, "end": 33, "type": "text", "text": "\n" },
         {
-          "tagName": "head",
+          "start": 33,
+          "end": 227,
+          "type": "tag",
+          "name": "head",
           "children": [
-            "\n  ",
-            { "tagName": "meta", "properties": { "charset": "UTF-8" } },
-            "\n  ",
+            { "start": 39, "end": 42, "type": "text", "text": "\n  " },
             {
-              "tagName": "meta",
+              "start": 42,
+              "end": 64,
+              "type": "tag",
+              "name": "meta",
+              "properties": { "charset": "UTF-8" }
+            },
+            { "start": 64, "end": 67, "type": "text", "text": "\n  " },
+            {
+              "start": 67,
+              "end": 137,
+              "type": "tag",
+              "name": "meta",
               "properties": {
                 "name": "viewport",
                 "content": "width=device-width, initial-scale=1.0"
               }
             },
-            "\n  ",
+            { "start": 137, "end": 140, "type": "text", "text": "\n  " },
             {
-              "tagName": "meta",
+              "start": 140,
+              "end": 193,
+              "type": "tag",
+              "name": "meta",
               "properties": {
                 "http-equiv": "X-UA-Compatible",
                 "content": "ie=edge"
               }
             },
-            "\n  ",
-            { "tagName": "title", "children": ["Document"] },
-            "\n"
-          ]
-        },
-        "\n",
-        {
-          "tagName": "body",
-          "children": [
-            "\n  ",
+            { "start": 193, "end": 196, "type": "text", "text": "\n  " },
             {
-              "tagName": "h1",
+              "start": 196,
+              "end": 219,
+              "type": "tag",
+              "name": "title",
               "children": [
-                "Hello, world! ",
-                { "tagName": "small", "children": ["by @leizm/html-parser"] }
+                { "start": 203, "end": 211, "type": "text", "text": "Document" }
               ]
             },
-            "\n  ",
-            {
-              "tagName": "p",
-              "children": ["Fast HTML parser written in pure JavaScript"]
-            },
-            "\n"
+            { "start": 219, "end": 220, "type": "text", "text": "\n" }
           ]
         },
-        "\n"
+        { "start": 227, "end": 228, "type": "text", "text": "\n" },
+        {
+          "start": 228,
+          "end": 357,
+          "type": "tag",
+          "name": "body",
+          "children": [
+            { "start": 234, "end": 237, "type": "text", "text": "\n  " },
+            {
+              "start": 237,
+              "end": 296,
+              "type": "tag",
+              "name": "h1",
+              "children": [
+                {
+                  "start": 241,
+                  "end": 255,
+                  "type": "text",
+                  "text": "Hello, world! "
+                },
+                {
+                  "start": 255,
+                  "end": 291,
+                  "type": "tag",
+                  "name": "small",
+                  "children": [
+                    {
+                      "start": 262,
+                      "end": 283,
+                      "type": "text",
+                      "text": "by @leizm/html-parser"
+                    }
+                  ]
+                }
+              ]
+            },
+            { "start": 296, "end": 299, "type": "text", "text": "\n  " },
+            {
+              "start": 299,
+              "end": 349,
+              "type": "tag",
+              "name": "p",
+              "children": [
+                {
+                  "start": 302,
+                  "end": 345,
+                  "type": "text",
+                  "text": "Fast HTML parser written in pure JavaScript"
+                }
+              ]
+            },
+            { "start": 349, "end": 350, "type": "text", "text": "\n" }
+          ]
+        },
+        { "start": 357, "end": 358, "type": "text", "text": "\n" }
       ]
     }
   ]
 }
 ```
 
-the result of `html.toString()` will be:
+the result of `html.toString()` should be:
 
 ```html
 <!DOCTYPE html>
