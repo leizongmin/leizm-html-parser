@@ -121,7 +121,13 @@ export function parse(input: string): Result {
   function addText(pos: number) {
     const str = getBuf(pos);
     if (str) {
-      pushToCurrentChildren(str);
+      // if the previous item is a text node, then combine it
+      const last = lastChildNode();
+      if (last && typeof last === "string") {
+        currentChildren[currentChildren.length - 1] = last + str;
+      } else {
+        pushToCurrentChildren(str);
+      }
     }
   }
 
@@ -224,6 +230,11 @@ export function parse(input: string): Result {
         } else if (c === C_GT) {
           currentTagName = getBuf(pos);
           changeState(addTag(), pos + 1);
+          continue;
+        } else if (c === C_LT) {
+          lastPos = lastPos - 1;
+          addText(pos);
+          changeState(S_TAG_NAME, pos + 1);
           continue;
         } else if (c === C_MINUS) {
           const pc = input.charCodeAt(pos - 1);
