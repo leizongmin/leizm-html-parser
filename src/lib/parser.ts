@@ -82,6 +82,7 @@ export function parse(input: string): Result {
   let currentPropQuote = 0;
   let currentPropName = "";
   let currentSelfClosing = false;
+  let isXMLMode = false;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
@@ -140,6 +141,9 @@ export function parse(input: string): Result {
     if (tagNameLow === "!doctype") {
       newTag.tagName = "!DOCTYPE";
     }
+    if (tagNameLow === "?xml") {
+      isXMLMode = true;
+    }
 
     if (isEnd) {
       const { tag, parent } = popNodeStack();
@@ -156,7 +160,12 @@ export function parse(input: string): Result {
         newTag.children = [];
       }
       pushToCurrentChildren(newTag);
-    } else if (isVoidTag(tagNameLow)) {
+    } else if (!isXMLMode && isVoidTag(tagNameLow)) {
+      pushToCurrentChildren(newTag);
+    } else if (tagNameLow === "?xml") {
+      if (newTag.properties) {
+        delete newTag.properties["?"];
+      }
       pushToCurrentChildren(newTag);
     } else {
       pushToCurrentChildren(newTag);

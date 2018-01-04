@@ -47,6 +47,8 @@ function nodesToString(nodes: NodeChildren): string {
                 `</${item.tagName}>`;
             } else if (isVoidTag(item.tagName)) {
               html += `<${item.tagName}${propsToString(item.properties)}>`;
+            } else if (item.tagName === "?xml") {
+              html += `<${item.tagName}${propsToString(item.properties)} ?>`;
             } else {
               html += `<${item.tagName}${propsToString(item.properties)} />`;
             }
