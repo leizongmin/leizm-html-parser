@@ -115,4 +115,15 @@ describe("pretty()", function() {
       );
     }
   });
+
+  it("pretty() on `xmlMode=true`", function() {
+    {
+      const html = "<input />";
+      assertPretty(html, pretty(html, {}), "<input>");
+    }
+    {
+      const html = "<input />";
+      assertPretty(html, pretty(html, { xmlMode: true }), "<input />");
+    }
+  });
 });

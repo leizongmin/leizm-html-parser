@@ -1,4 +1,11 @@
-import { NodeChildren, TextNode, TagNode, parse, toString } from "./index";
+import {
+  NodeChildren,
+  TextNode,
+  TagNode,
+  parse,
+  toString,
+  ParseOptions
+} from "./index";
 
 const REG_REMOVE_SPACES = /^\s+|\s+$/g;
 
@@ -95,6 +102,9 @@ export function prettyNodes(
  * @param html
  * @param options
  */
-export function pretty(html: string, options: PrettyOptions = {}): string {
-  return toString(prettyNodes(parse(html).nodes, options));
+export function pretty(
+  html: string,
+  options: PrettyOptions & ParseOptions = {}
+): string {
+  return toString(prettyNodes(parse(html, options).nodes, options), options);
 }

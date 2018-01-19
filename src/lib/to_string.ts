@@ -1,9 +1,22 @@
-import { NodeChildren, Properties, TextNode, TagNode } from "./index";
+import {
+  NodeChildren,
+  Properties,
+  TextNode,
+  TagNode,
+  PrettyOptions,
+  prettyNodes
+} from "./index";
 import { isVoidTag } from "./tags";
 
-export interface ToStringOptions {
+export interface ToStringOptions extends PrettyOptions {
+  /**
+   * enable pretty
+   */
   pretty?: boolean;
-  indent?: string;
+  /**
+   * parse source on XML document mode
+   */
+  xmlMode?: boolean;
 }
 
 export function toString(
@@ -13,12 +26,12 @@ export function toString(
   options.pretty = !!options.pretty;
   options.indent = options.pretty ? options.indent || "\t" : "";
   if (options.pretty) {
-    nodes = prettyHtml(nodes, options.indent);
+    nodes = prettyNodes(nodes, options);
   }
-  return nodesToString(nodes);
+  return nodesToString(nodes, options.xmlMode);
 }
 
-function nodesToString(nodes: NodeChildren): string {
+function nodesToString(nodes: NodeChildren, xmlMode: boolean = false): string {
   let html = "";
   if (nodes) {
     for (const item of nodes) {
@@ -46,7 +59,7 @@ function nodesToString(nodes: NodeChildren): string {
                 `<${tag.name}${propsToString(tag.properties)}>` +
                 nodesToString(tag.children) +
                 `</${tag.name}>`;
-            } else if (isVoidTag(tag.name)) {
+            } else if (!xmlMode && isVoidTag(tag.name)) {
               html += `<${tag.name}${propsToString(tag.properties)}>`;
             } else if (tag.name === "?xml") {
               html += `<${tag.name}${propsToString(tag.properties)} ?>`;
@@ -95,8 +108,4 @@ function escapeHtml(str: string): string {
     }
   }
   return ret;
-}
-
-function prettyHtml(nodes: NodeChildren, indent: string): NodeChildren {
-  return nodes;
 }
