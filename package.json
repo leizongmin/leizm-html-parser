@@ -1,6 +1,6 @@
 {
   "name": "@leizm/html-parser",
-  "version": "1.0.0-rc6",
+  "version": "1.0.0-rc7",
   "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
   "typings": "dist/lib/index.d.ts",
