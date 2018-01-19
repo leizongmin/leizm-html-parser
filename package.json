@@ -1,32 +1,28 @@
 {
   "name": "@leizm/html-parser",
-  "version": "1.0.0-rc5",
+  "version": "1.0.0-rc6",
   "description": "Fast HTML parser written in pure JavaScript",
   "main": "dist/lib/index.js",
+  "typings": "dist/lib/index.d.ts",
+  "files": ["dist/lib"],
   "scripts": {
     "test": "npm run compile && mocha dist/test/**/*.test.js",
     "test-fast": "mocha --require ts-node/register src/test/**/*.test.ts",
-    "coverage": "nyc --reporter=lcov mocha --require ts-node/register src/test/**/*.test.ts && nyc report",
+    "coverage":
+      "nyc --reporter=lcov mocha --require ts-node/register src/test/**/*.test.ts && nyc report",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "compile": "rm -rf dist && tsc",
     "prepublish": "npm run compile && npm run test"
   },
   "nyc": {
-    "extension": [
-      ".ts"
-    ],
-    "exclude": [
-      "**/*.d.ts"
-    ]
+    "extension": [".ts"],
+    "exclude": ["**/*.d.ts"]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leizongmin/leizm-html-parser.git"
   },
-  "keywords": [
-    "html",
-    "parser"
-  ],
+  "keywords": ["html", "parser"],
   "author": "Zongmin Lei <leizongmin@gmail.com>",
   "license": "MIT",
   "bugs": {
