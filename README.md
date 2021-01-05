@@ -1,4 +1,5 @@
 ![Node.js CI](https://github.com/leizongmin/leizm-html-parser/workflows/Node.js%20CI/badge.svg)
+[![DeepScan grade](https://deepscan.io/api/teams/2068/projects/2782/branches/20098/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=2068&pid=2782&bid=20098)
 [![NPM version][npm-image]][npm-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 [![David deps][david-image]][david-url]
