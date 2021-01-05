@@ -2,7 +2,7 @@ const util = require("util");
 const parse5 = require("parse5");
 
 const chunks = [];
-process.stdin.on("data", chunk => {
+process.stdin.on("data", (chunk) => {
   chunks.push(chunk);
 });
 process.stdin.on("end", () => {
@@ -38,7 +38,7 @@ function transform(nodes) {
         start: item.__location.startOffset,
         end: item.__location.endOffset,
         type: "text",
-        text: item.value
+        text: item.value,
       });
     } else {
       let props = {};
@@ -53,7 +53,7 @@ function transform(nodes) {
         end: item.__location.endOffset,
         type: "tag",
         name: item.nodeName,
-        properties: props
+        properties: props,
       });
       if (item.childNodes) {
         ret[ret.length - 1].children = transform(item.childNodes);

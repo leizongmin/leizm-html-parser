@@ -1,118 +1,112 @@
 import { assert } from "./utils";
 
-describe("Attribute values", function() {
-  it("Empty attribute syntax", function() {
+describe("Attribute values", function () {
+  it("Empty attribute syntax", function () {
     assert("<tag a b hello world />", [
       {
-        type: 'tag',
+        type: "tag",
         name: "tag",
         properties: {
           a: true,
           b: true,
           hello: true,
-          world: true
-        }
-      }
+          world: true,
+        },
+      },
     ]);
   });
 
-  it("Unquoted attribute value syntax", function() {
+  it("Unquoted attribute value syntax", function () {
     assert("<input type=image value=yes src=http://example.com title=button>", [
       {
-        type: 'tag',
+        type: "tag",
         name: "input",
         properties: {
           src: "http://example.com",
           title: "button",
           type: "image",
-          value: "yes"
-        }
-      }
+          value: "yes",
+        },
+      },
     ]);
   });
 
-  it("Single-quoted attribute value syntax", function() {
-    assert(
-      "<input type='image' value='yes' src='http://example.com \" space' title='image button'>",
-      [
-        {
-          type: 'tag',
-          name: "input",
-          properties: {
-            src: 'http://example.com " space',
-            title: "image button",
-            type: "image",
-            value: "yes"
-          }
-        }
-      ]
-    );
+  it("Single-quoted attribute value syntax", function () {
+    assert("<input type='image' value='yes' src='http://example.com \" space' title='image button'>", [
+      {
+        type: "tag",
+        name: "input",
+        properties: {
+          src: 'http://example.com " space',
+          title: "image button",
+          type: "image",
+          value: "yes",
+        },
+      },
+    ]);
   });
 
-  it("Double-quoted attribute value syntax", function() {
-    assert(
-      '<input type="image" value="yes" src="http://example.com \' space" title="image button">',
-      [
-        {
-          type: 'tag',
-          name: "input",
-          properties: {
-            src: "http://example.com ' space",
-            title: "image button",
-            type: "image",
-            value: "yes"
-          }
-        }
-      ]
-    );
+  it("Double-quoted attribute value syntax", function () {
+    assert('<input type="image" value="yes" src="http://example.com \' space" title="image button">', [
+      {
+        type: "tag",
+        name: "input",
+        properties: {
+          src: "http://example.com ' space",
+          title: "image button",
+          type: "image",
+          value: "yes",
+        },
+      },
+    ]);
   });
 
-  it("Namespace attribute value syntax", function() {
+  it("Namespace attribute value syntax", function () {
     assert('<svg xlink:href="hello.svg" xlink:title="hello world"></svg>', [
       {
-        type: 'tag',
+        type: "tag",
         name: "svg",
         properties: {
           "xlink:href": "hello.svg",
-          "xlink:title": "hello world"
+          "xlink:title": "hello world",
         },
-        children: []
-      }
+        children: [],
+      },
     ]);
   });
 
-  it("Attribute value includes <>", function() {
+  it("Attribute value includes <>", function () {
     assert('<tag attr="<>" />', [
       {
-        type: 'tag',
+        type: "tag",
         name: "tag",
-        properties: { attr: "<>" }
-      }
+        properties: { attr: "<>" },
+      },
     ]);
   });
 
-  it("Obnormal attributes", function() {
+  it("Obnormal attributes", function () {
     assert("<tag abc= cdef />", [
       {
-        type: 'tag',
+        type: "tag",
         name: "tag",
-        properties: { abc: true, cdef: true }
-      }
+        properties: { abc: true, cdef: true },
+      },
     ]);
     assert('<tag a="1"b="2"></tag>', [
       {
-        type: 'tag',
+        type: "tag",
         name: "tag",
         properties: { a: "1", b: "2" },
-        children: []
-      }
+        children: [],
+      },
     ]);
     assert('<tag a="1"b="2"/>', [
       {
-        type: 'tag',
+        type: "tag",
         name: "tag",
-        properties: { a: "1", b: "2" }
-      }
+        properties: { a: "1", b: "2" },
+      },
     ]);
   });
 });

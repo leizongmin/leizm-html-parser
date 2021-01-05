@@ -1,11 +1,4 @@
-import {
-  NodeChildren,
-  TextNode,
-  TagNode,
-  parse,
-  toString,
-  ParseOptions
-} from "./index";
+import { NodeChildren, TextNode, TagNode, parse, toString, ParseOptions } from "./index";
 
 const REG_REMOVE_SPACES = /^\s+|\s+$/g;
 
@@ -23,10 +16,7 @@ export interface PrettyOptions {
  * @param nodes
  * @param options
  */
-export function prettyNodes(
-  nodes: NodeChildren,
-  options: PrettyOptions = {}
-): NodeChildren {
+export function prettyNodes(nodes: NodeChildren, options: PrettyOptions = {}): NodeChildren {
   if (nodes.length > 0) {
     // only when there is unless one Node, then starts the pretty process
     let indent = "";
@@ -38,11 +28,7 @@ export function prettyNodes(
       }
     }
 
-    function walk(
-      nodes: NodeChildren,
-      level: number,
-      indent: string
-    ): NodeChildren {
+    function walk(nodes: NodeChildren, level: number, indent: string): NodeChildren {
       for (let i = 0; i < nodes.length; i++) {
         const item = nodes[i];
         if (item.type === "text") {
@@ -55,11 +41,7 @@ export function prettyNodes(
           }
         }
       }
-      if (
-        level &&
-        indent &&
-        !(nodes.length === 1 && nodes[0].type === "text")
-      ) {
+      if (level && indent && !(nodes.length === 1 && nodes[0].type === "text")) {
         const whiteSpaces = "\n" + indent.repeat(level);
         for (let i = 0; i < nodes.length; i += 2) {
           nodes.splice(i, -1, { type: "text", text: whiteSpaces });
@@ -102,9 +84,6 @@ export function prettyNodes(
  * @param html
  * @param options
  */
-export function pretty(
-  html: string,
-  options: PrettyOptions & ParseOptions = {}
-): string {
+export function pretty(html: string, options: PrettyOptions & ParseOptions = {}): string {
   return toString(prettyNodes(parse(html, options).nodes, options), options);
 }

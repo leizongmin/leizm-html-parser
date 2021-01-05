@@ -12,10 +12,7 @@ export interface MinifyOptions {
  * @param nodes
  * @param options
  */
-export function minifyNodes(
-  nodes: NodeChildren,
-  options: MinifyOptions = {}
-): NodeChildren {
+export function minifyNodes(nodes: NodeChildren, options: MinifyOptions = {}): NodeChildren {
   if (nodes.length > 0) {
     function walk(nodes: NodeChildren): NodeChildren {
       for (let i = 0; i < nodes.length; i++) {

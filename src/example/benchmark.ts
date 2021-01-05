@@ -4,12 +4,8 @@ import * as util from "util";
 import { parse, toString } from "../lib";
 import * as colors from "colors";
 
-const file1 = fs
-  .readFileSync(path.resolve(__dirname, "../../test/file1.html"))
-  .toString();
-const file2 = fs
-  .readFileSync(path.resolve(__dirname, "../../test/file2.html"))
-  .toString();
+const file1 = fs.readFileSync(path.resolve(__dirname, "../../test/file1.html")).toString();
+const file2 = fs.readFileSync(path.resolve(__dirname, "../../test/file2.html")).toString();
 
 function parseHTML(title: string, content: string) {
   const input = content.toString();
@@ -32,7 +28,7 @@ function parseHTML(title: string, content: string) {
     title,
     spent1.toFixed(3),
     speed.toFixed(1),
-    spent2.toFixed(3)
+    spent2.toFixed(3),
   );
 }
 
@@ -42,7 +38,7 @@ for (let i = 0; i < count; i++) {
   lines.push(parseHTML("file1", file1));
   lines.push(parseHTML("file2", file2));
   if (i % 10 === 0) {
-    console.log('progress: %s%%', (i / count * 100).toFixed(2));
+    console.log("progress: %s%%", ((i / count) * 100).toFixed(2));
   }
 }
 lines.forEach((line, i) => {

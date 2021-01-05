@@ -1,10 +1,4 @@
-import {
-  isVoidTag,
-  isNonVoidTag,
-  isHtml5Tag,
-  isRawTextTag,
-  isEscapableRawTextTag
-} from "./tags";
+import { isVoidTag, isNonVoidTag, isHtml5Tag, isRawTextTag, isEscapableRawTextTag } from "./tags";
 
 export interface Node {
   /**
@@ -134,9 +128,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
   function popNodeStack() {
     const tag = currentStack.pop() as TagNode;
     const parent = currentStack[currentStack.length - 1];
-    currentChildren = parent
-      ? (parent.children as Array<TextNode | TagNode>)
-      : nodes;
+    currentChildren = parent ? (parent.children as Array<TextNode | TagNode>) : nodes;
     return { tag, parent };
   }
 
@@ -170,7 +162,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           start: lastPos,
           end: pos,
           type: "text",
-          text: str
+          text: str,
         };
         pushToCurrentChildren(node);
       }
@@ -184,7 +176,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
         start: lastPos,
         end: pos,
         type: "text",
-        text: str
+        text: str,
       };
     }
   }
@@ -200,7 +192,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
       start: currentTagPos,
       end: endPos,
       type: "tag",
-      name: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName
+      name: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName,
     };
     if (Object.keys(currentProps).length > 0) {
       newTag.properties = currentProps;
@@ -216,12 +208,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
       const { tag, parent } = popNodeStack();
       if (tag) {
         if (tag.name !== newTag.name) {
-          emitError(
-            lastPos - 1,
-            `start tag and end tag does not match: <${tag.name}></${
-              newTag.name
-            }>`
-          );
+          emitError(lastPos - 1, `start tag and end tag does not match: <${tag.name}></${newTag.name}>`);
         }
         tag.end = newTag.end;
       }

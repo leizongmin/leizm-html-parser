@@ -1,7 +1,7 @@
 import { assert } from "./utils";
 
-describe("CDATA sections", function() {
-  it("Normal", function() {
+describe("CDATA sections", function () {
+  it("Normal", function () {
     assert("<ms><![CDATA[x<y]]></ms>", [
       {
         type: "tag",
@@ -10,14 +10,14 @@ describe("CDATA sections", function() {
           {
             type: "tag",
             name: "![CDATA[",
-            children: [{ type: "text", text: "x<y" }]
-          }
-        ]
-      }
+            children: [{ type: "text", text: "x<y" }],
+          },
+        ],
+      },
     ]);
   });
 
-  it("Nesting", function() {
+  it("Nesting", function () {
     assert("<ms><![CDATA[ <![CDATA[ <b>hello</b> ]]></ms>", [
       {
         type: "tag",
@@ -26,10 +26,10 @@ describe("CDATA sections", function() {
           {
             type: "tag",
             name: "![CDATA[",
-            children: [{ type: "text", text: " <![CDATA[ <b>hello</b> " }]
-          }
-        ]
-      }
+            children: [{ type: "text", text: " <![CDATA[ <b>hello</b> " }],
+          },
+        ],
+      },
     ]);
   });
 });

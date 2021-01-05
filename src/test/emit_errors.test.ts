@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { toString, parse } from "../lib";
 
-describe("Emit errors", function() {
-  it("Start tag and end tag does not match", function() {
+describe("Emit errors", function () {
+  it("Start tag and end tag does not match", function () {
     const { nodes, errors } = parse("<a>hello<c>world</d></b>");
     expect(nodes).to.deep.equal([
       {
@@ -17,20 +17,20 @@ describe("Emit errors", function() {
             end: 20,
             type: "tag",
             name: "c",
-            children: [{ start: 11, end: 16, type: "text", text: "world" }]
-          }
-        ]
-      }
+            children: [{ start: 11, end: 16, type: "text", text: "world" }],
+          },
+        ],
+      },
     ]);
     expect(errors).to.deep.equal([
       {
         position: 16,
-        message: "start tag and end tag does not match: <c></d>"
+        message: "start tag and end tag does not match: <c></d>",
       },
       {
         position: 20,
-        message: "start tag and end tag does not match: <a></b>"
-      }
+        message: "start tag and end tag does not match: <a></b>",
+      },
     ]);
   });
 });

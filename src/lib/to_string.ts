@@ -1,11 +1,4 @@
-import {
-  NodeChildren,
-  Properties,
-  TextNode,
-  TagNode,
-  PrettyOptions,
-  prettyNodes
-} from "./index";
+import { NodeChildren, Properties, TextNode, TagNode, PrettyOptions, prettyNodes } from "./index";
 import { isVoidTag } from "./tags";
 
 export interface ToStringOptions extends PrettyOptions {
@@ -19,10 +12,7 @@ export interface ToStringOptions extends PrettyOptions {
   xmlMode?: boolean;
 }
 
-export function toString(
-  nodes: NodeChildren,
-  options: ToStringOptions = {}
-): string {
+export function toString(nodes: NodeChildren, options: ToStringOptions = {}): string {
   options.pretty = !!options.pretty;
   options.indent = options.pretty ? options.indent || "\t" : "";
   if (options.pretty) {
@@ -55,10 +45,7 @@ function nodesToString(nodes: NodeChildren, xmlMode: boolean = false): string {
             break;
           default:
             if (tag.children) {
-              html +=
-                `<${tag.name}${propsToString(tag.properties)}>` +
-                nodesToString(tag.children) +
-                `</${tag.name}>`;
+              html += `<${tag.name}${propsToString(tag.properties)}>` + nodesToString(tag.children) + `</${tag.name}>`;
             } else if (!xmlMode && isVoidTag(tag.name)) {
               html += `<${tag.name}${propsToString(tag.properties)}>`;
             } else if (tag.name === "?xml") {

@@ -1,15 +1,15 @@
 import { assert } from "./utils";
 
-describe("HTML5 tags", function() {
-  it("DOCTYPE", function() {
+describe("HTML5 tags", function () {
+  it("DOCTYPE", function () {
     assert("<!doctype html>", [
       {
         type: "tag",
         name: "!DOCTYPE",
         properties: {
-          html: true
-        }
-      }
+          html: true,
+        },
+      },
     ]);
 
     assert('<!doctype html SYSTEM "about:legacy-compat">', [
@@ -19,9 +19,9 @@ describe("HTML5 tags", function() {
         properties: {
           html: true,
           SYSTEM: true,
-          '"about:legacy-compat"': true
-        }
-      }
+          '"about:legacy-compat"': true,
+        },
+      },
     ]);
 
     assert("<!doctype html SYSTEM 'about:legacy-compat'>", [
@@ -31,13 +31,13 @@ describe("HTML5 tags", function() {
         properties: {
           html: true,
           SYSTEM: true,
-          '"about:legacy-compat"': true
-        }
-      }
+          '"about:legacy-compat"': true,
+        },
+      },
     ]);
   });
 
-  it("Auto change to lowercase", function() {
+  it("Auto change to lowercase", function () {
     assert('<Div><A href="#">link</A></DIV>', [
       {
         type: "tag",
@@ -47,10 +47,10 @@ describe("HTML5 tags", function() {
             type: "tag",
             name: "a",
             properties: { href: "#" },
-            children: [{ type: "text", text: "link" }]
-          }
-        ]
-      }
+            children: [{ type: "text", text: "link" }],
+          },
+        ],
+      },
     ]);
     assert('<DIv><MyCustomTag href="#">link</MyCustomTag></div>', [
       {
@@ -61,10 +61,10 @@ describe("HTML5 tags", function() {
             type: "tag",
             name: "MyCustomTag",
             properties: { href: "#" },
-            children: [{ type: "text", text: "link" }]
-          }
-        ]
-      }
+            children: [{ type: "text", text: "link" }],
+          },
+        ],
+      },
     ]);
   });
 });

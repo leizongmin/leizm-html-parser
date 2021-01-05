@@ -3,16 +3,11 @@ import { inspect } from "util";
 import * as colors from "colors";
 import { parse, ParseOptions, Result, toString, NodeChildren, TagNode } from "../lib";
 
-export const enableDump =
-  process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1;
+export const enableDump = process.env.DEBUG && String(process.env.DEBUG).indexOf("dump") !== -1;
 
 export const PAGING = "`".repeat(process.stdout.columns || 80);
 
-export function assert(
-  html: string,
-  nodes: NodeChildren,
-  options: ParseOptions = {}
-) {
+export function assert(html: string, nodes: NodeChildren, options: ParseOptions = {}) {
   strictAssert(html, nodes, options, function (ret) {
     // remove all position info
     function removePosition(nodes: NodeChildren) {
@@ -34,7 +29,7 @@ export function strictAssert(
   html: string,
   nodes: NodeChildren,
   options: ParseOptions = {},
-  onResult?: (ret: Result) => Result
+  onResult?: (ret: Result) => Result,
 ) {
   let ret = parse(html, options);
   if (enableDump) {
@@ -42,21 +37,11 @@ export function strictAssert(
     console.log(colors.cyan(PAGING));
     console.log(colors.blue(inspect(ret.nodes, { depth: 10, colors: true })));
     console.log(colors.cyan(inspect(nodes, { depth: 10, colors: true })));
-    console.log(
-      colors.magenta("before:"),
-      (textHasMulitLines(html) ? "\n" : "") + colors.blue(html)
-    );
-    console.log(
-      colors.magenta("after: "),
-      (textHasMulitLines(output) ? "\n" : "") + colors.cyan(output)
-    );
+    console.log(colors.magenta("before:"), (textHasMulitLines(html) ? "\n" : "") + colors.blue(html));
+    console.log(colors.magenta("after: "), (textHasMulitLines(output) ? "\n" : "") + colors.cyan(output));
     if (ret.errors.length > 0) {
       for (const err of ret.errors) {
-        console.log(
-          colors.magenta("Error"),
-          colors.yellow(`[${err.position}]`),
-          colors.red(err.message)
-        );
+        console.log(colors.magenta("Error"), colors.yellow(`[${err.position}]`), colors.red(err.message));
       }
     }
     console.log(colors.cyan(PAGING));
