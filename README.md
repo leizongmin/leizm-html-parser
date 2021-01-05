@@ -1,5 +1,5 @@
+![Node.js CI](https://github.com/leizongmin/leizm-html-parser/workflows/Node.js%20CI/badge.svg)
 [![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 [![David deps][david-image]][david-url]
 [![node version][node-image]][node-url]
@@ -8,8 +8,6 @@
 
 [npm-image]: https://img.shields.io/npm/v/@leizm/html-parser.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/@leizm/html-parser
-[travis-image]: https://img.shields.io/travis/leizongmin/leizm-html-parser.svg?style=flat-square
-[travis-url]: https://travis-ci.org/leizongmin/leizm-html-parser
 [coveralls-image]: https://img.shields.io/coveralls/leizongmin/leizm-html-parser.svg?style=flat-square
 [coveralls-url]: https://coveralls.io/r/leizongmin/leizm-html-parser?branch=master
 [david-image]: https://img.shields.io/david/leizongmin/leizm-html-parser.svg?style=flat-square
