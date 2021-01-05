@@ -1,4 +1,4 @@
-import { isVoidTag, isNonVoidTag, isHtml5Tag, isRawTextTag, isEscapableRawTextTag } from "./tags";
+import { isVoidTag, isNonVoidTag, isHtml5Tag, isRawTextTag } from "./tags";
 
 export interface Node {
   /**
@@ -205,7 +205,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
     }
 
     if (isEnd) {
-      const { tag, parent } = popNodeStack();
+      const { tag } = popNodeStack();
       if (tag) {
         if (tag.name !== newTag.name) {
           emitError(lastPos - 1, `start tag and end tag does not match: <${tag.name}></${newTag.name}>`);

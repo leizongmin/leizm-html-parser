@@ -41,7 +41,7 @@ export function minifyNodes(nodes: NodeChildren, options: MinifyOptions = {}): N
     if (nodes[0] && nodes[0].type === "text") {
       const textNode = nodes[0] as TextNode;
       textNode.text = textNode.text.trimLeft();
-      if (!nodes[0]) {
+      if (textNode.text.length < 1) {
         nodes.splice(0, 1);
       }
     }
@@ -49,7 +49,7 @@ export function minifyNodes(nodes: NodeChildren, options: MinifyOptions = {}): N
     if (nodes[lastIndex] && nodes[lastIndex].type === "text") {
       const textNode = nodes[lastIndex] as TextNode;
       textNode.text = textNode.text.trimRight();
-      if (!nodes[lastIndex]) {
+      if (textNode.text.length < 1) {
         nodes.splice(lastIndex, 1);
       }
     }

@@ -45,7 +45,7 @@ function transform(nodes) {
       for (const p of item.attrs) {
         props[p.name] = p.value;
       }
-      if (Object.keys(props)) {
+      if (Object.keys(props).length === 0) {
         props = undefined;
       }
       ret.push({

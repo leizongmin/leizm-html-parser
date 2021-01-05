@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { toString, parse } from "../lib";
+import { parse } from "../lib";
 
 describe("Emit errors", function () {
   it("Start tag and end tag does not match", function () {
