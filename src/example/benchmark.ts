@@ -4,8 +4,8 @@ import * as util from "util";
 import { parse, toString } from "../lib";
 import * as colors from "colors";
 
-const file1 = fs.readFileSync(path.resolve(__dirname, "../../test/file1.html")).toString();
-const file2 = fs.readFileSync(path.resolve(__dirname, "../../test/file2.html")).toString();
+const file1 = fs.readFileSync(path.resolve(__dirname, "../../fixtures/file1.html")).toString();
+const file2 = fs.readFileSync(path.resolve(__dirname, "../../fixtures/file2.html")).toString();
 
 function parseHTML(title: string, content: string) {
   const input = content.toString();
