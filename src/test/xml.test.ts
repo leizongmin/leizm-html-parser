@@ -1,6 +1,11 @@
 import { assert } from "./utils";
 
 describe("XML document", function () {
+  it("self closed", function () {
+    assert(`<item />`, [{ type: "tag", name: "item" }]);
+    assert(`<item/>`, [{ type: "tag", name: "item" }]);
+  });
+
   it("Normal XML", function () {
     assert(
       `<?xml version="1.0" encoding="UTF-8"?>

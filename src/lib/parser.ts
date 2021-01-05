@@ -281,6 +281,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
           continue;
         } else if (c === C_GT) {
           currentTagName = getBuf(pos);
+          if (currentTagName.endsWith("/")) {
+            currentTagName = currentTagName.slice(0, -1);
+            currentSelfClosing = true;
+          }
           currentTagPos = lastPos - 1;
           changeState(addTag(pos + 1), pos + 1);
           continue;
