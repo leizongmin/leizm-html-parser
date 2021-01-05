@@ -7,12 +7,12 @@ describe("HTML files", function () {
   const dir = path.resolve(__dirname, "../../fixtures/html");
   const files = fs
     .readdirSync(dir)
-    .filter((n) => /\.html?$/.test(n))
+    .filter((n) => /\.(ht|x)ml?$/.test(n))
     .map((n) => path.resolve(dir, n));
 
   files.forEach((f) => {
     it(`file ${path.basename(f)}`, function () {
-      const { errors } = parse(fs.readFileSync(f).toString(), { removePosition: true, xmlMode: false });
+      const { errors } = parse(fs.readFileSync(f).toString(), { removePosition: true, xmlMode: f.endsWith(".xml") });
       expect(errors).to.deep.eq([]);
     });
   });
