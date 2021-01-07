@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test @leizm/html-parser</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script src="../../dist/parser.min.js"></script>
+<script>
+  const html = require("@leizm/html-parser");
+  const { errors, nodes } = html.parse(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Hello, world! <small>by @leizm/html-parser</small></h1>
+  <p>Fast HTML parser written in pure JavaScript</p>
+</body>
+</html>`);
+
+  const data = JSON.stringify({ errors, nodes }, undefined, 2);
+  console.log(data);
+  console.log(html.toString(nodes));
+  const pre = document.createElement("pre");
+  pre.innerText = data;
+  document.body.appendChild(pre);
+</script>
