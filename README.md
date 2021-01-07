@@ -202,6 +202,17 @@ the result of `html.toString()` should be:
 </html>
 ```
 
+## On Browser-side
+
+```html
+<script src="https://unpkg.com/@leizm/html-parser/dist/parser.min.js"></script>
+<script>
+  const html = require("@leizm/html-parser");
+  const { errors, nodes } = html.parse(`<strong>hello</strong>`);
+  // ...
+</script>
+```
+
 ## License
 
 ```text
