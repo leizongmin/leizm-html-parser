@@ -213,6 +213,17 @@ the result of `html.toString()` should be:
 </script>
 ```
 
+## Benchmark
+
+Environment:
+
+- Node v15.4.0
+- Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+
+Result:
+- file1 size: 0.12M, parse: 18.4M/s, toString: 49.2M/s
+- file2 size: 5.04M, parse: 15.4M/s, toString: 9.2M/s
+
 ## License
 
 ```text
