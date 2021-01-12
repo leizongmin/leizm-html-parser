@@ -29,3 +29,4 @@ jobs:
     - run: npm test
     - run: npm run coverage
     - run: npm run coveralls
+    - run: node --prof dist/example/benchmark.js && node --prof-process isolate-*-v8.log

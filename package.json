@@ -18,7 +18,7 @@
     "prepublish": "npm run compile && npm run test && npm run build-one",
     "format": "prettier --write 'src/**/*.ts'",
     "build-one": "browserify -r ./dist/lib/index.js:@leizm/html-parser -o ./dist/parser.js && terser -o ./dist/parser.min.js ./dist/parser.js",
-    "benchmark": "npm run compile && node dist/example/benchmark.js"
+    "benchmark": "npm run compile && rm -rf isolate-*-v8.log && node --prof dist/example/benchmark.js && node --prof-process isolate-*-v8.log > benchmark-prof.log"
   },
   "nyc": {
     "extension": [
