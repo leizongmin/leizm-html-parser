@@ -31,6 +31,8 @@ npm install @leizm/html-parser --save
 
 ## Usage
 
+### Node.js or Webpack
+
 ```typescript
 import * as html from "@leizm/html-parser";
 
@@ -52,7 +54,9 @@ console.log({ errors, nodes });
 console.log(html.toString(nodes));
 ```
 
-the result of `html.parse()` should be:
+The result of `html.parse()` should be:
+
+<details><summary>View details</summary>
 
 ```json
 {
@@ -184,7 +188,9 @@ the result of `html.parse()` should be:
 }
 ```
 
-the result of `html.toString()` should be:
+</details>
+
+The result of `html.toString()` should be:
 
 ```html
 <!DOCTYPE html>
@@ -202,7 +208,9 @@ the result of `html.toString()` should be:
 </html>
 ```
 
-## On Browser-side
+### Browser-side
+
+`parser.min.js` is pack by [Browserify](http://browserify.org/), it provided an `require()` function to load the module:
 
 ```html
 <script src="https://unpkg.com/@leizm/html-parser/dist/parser.min.js"></script>
