@@ -112,6 +112,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
   let currentPropName = "";
   let currentSelfClosing = false;
   let xmlMode = options.xmlMode ? true : false;
+  const keepPosition = !!!options.removePosition;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
@@ -141,10 +142,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
     lastPos = pos;
   }
 
-  function pushToCurrentChildren(item: TextNode | TagNode) {
-    if (options.removePosition) {
-      delete item.start;
-      delete item.end;
+  function pushToCurrentChildren(item: TextNode | TagNode, start: number, end: number) {
+    if (keepPosition) {
+      item.start = start;
+      item.end = end;
     }
     currentChildren.push(item);
   }
@@ -159,12 +160,10 @@ export function parse(input: string, options: ParseOptions = {}): Result {
         last.end = pos;
       } else {
         const node: TextNode = {
-          start: lastPos,
-          end: pos,
           type: "text",
           text: str,
         };
-        pushToCurrentChildren(node);
+        pushToCurrentChildren(node, lastPos, pos);
       }
     }
   }
@@ -189,8 +188,6 @@ export function parse(input: string, options: ParseOptions = {}): Result {
       tagNameLow = tagNameLow.slice(1);
     }
     const newTag: TagNode = {
-      start: currentTagPos,
-      end: endPos,
       type: "tag",
       name: isHtml5Tag(tagNameLow) ? tagNameLow : currentTagName,
     };
@@ -210,23 +207,25 @@ export function parse(input: string, options: ParseOptions = {}): Result {
         if (tag.name !== newTag.name) {
           emitError(lastPos - 1, `start tag and end tag does not match: <${tag.name}></${newTag.name}>`);
         }
-        tag.end = newTag.end;
+        if ("end" in tag) {
+          tag.end = endPos;
+        }
       }
     } else if (currentSelfClosing) {
       if (isNonVoidTag(tagNameLow)) {
         newTag.children = [];
       }
-      pushToCurrentChildren(newTag);
+      pushToCurrentChildren(newTag, currentTagPos, endPos);
     } else if (!xmlMode && isVoidTag(tagNameLow)) {
-      pushToCurrentChildren(newTag);
+      pushToCurrentChildren(newTag, currentTagPos, endPos);
     } else if (tagNameLow === "?xml") {
       if (newTag.properties) {
         delete newTag.properties["?"];
       }
-      pushToCurrentChildren(newTag);
+      pushToCurrentChildren(newTag, currentTagPos, endPos);
     } else {
-      pushToCurrentChildren(newTag);
-      const last = lastChildNode() as TagNode;
+      pushToCurrentChildren(newTag, currentTagPos, endPos);
+      const last = lastChildNode();
       last.children = last.children || [];
       currentStack.push(last);
       currentChildren = last.children as TagNode[];

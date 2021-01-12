@@ -15,7 +15,7 @@ const files = ["file1", "file2"].map((title) => {
 function runTest(title: string, content: string) {
   const input = content.toString();
   const start = process.uptime();
-  const { errors, nodes } = parse(input);
+  const { errors, nodes } = parse(input, { removePosition: false });
   const end = process.uptime();
   const html = toString(nodes);
   const end2 = process.uptime();
