@@ -90,7 +90,6 @@ console.log("");
 console.log(colors.green("## Benchmark"));
 console.log("");
 console.log(colors.green("Environment:"));
-console.log("");
 console.log(colors.green("- Node %s"), process.version);
 console.log(colors.green("- %s"), os.cpus()[0].model);
 console.log("");

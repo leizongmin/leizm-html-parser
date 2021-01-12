@@ -216,7 +216,6 @@ the result of `html.toString()` should be:
 ## Benchmark
 
 Environment:
-
 - Node v15.4.0
 - Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
 
