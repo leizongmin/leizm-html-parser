@@ -112,7 +112,7 @@ export function parse(input: string, options: ParseOptions = {}): Result {
   let currentPropName = "";
   let currentSelfClosing = false;
   let xmlMode = options.xmlMode ? true : false;
-  const keepPosition = !!!options.removePosition;
+  const keepPosition = !options.removePosition;
 
   function emitError(position: number, message: string) {
     errors.push({ position, message });
