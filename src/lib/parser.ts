@@ -1,4 +1,4 @@
-import { isVoidTag, isNonVoidTag, isHtml5Tag, isRawTextTag } from "./tags";
+import { isVoidTag, isNonVoidTag, isHtml5Tag, isRawTextTag } from "./tags.ts";
 
 export interface Node {
   /**

@@ -1,5 +1,6 @@
-import { NodeChildren, Properties, TextNode, TagNode, PrettyOptions, prettyNodes } from "./index";
-import { isVoidTag } from "./tags";
+import { NodeChildren, Properties, TextNode, TagNode } from "./parser.ts";
+import { PrettyOptions, prettyNodes } from "./pretty.ts";
+import { isVoidTag } from "./tags.ts";
 
 export interface ToStringOptions extends PrettyOptions {
   /**
